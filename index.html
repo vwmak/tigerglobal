@@ -178,6 +178,7 @@
       <label>View:</label>
       <select id="viewSelect">
         <option value="all">All Quarters</option>
+        <option value="2025">2025</option>
         <option value="2024">2024</option>
         <option value="2023">2023</option>
         <option value="2022">2022</option>
@@ -278,9 +279,21 @@ const RAW = {
   '2023-Q2': { lc: 1.73, upstart: 1.30, sofi: 3.67, oportun: 0.45, onemain: 3.78 },
   '2023-Q3': { lc: 1.78, upstart: 1.35, sofi: 3.98, oportun: 0.42, onemain: 3.84 },
   '2023-Q4': { lc: 1.52, upstart: 1.29, sofi: 4.01, oportun: 0.38, onemain: 3.80 },
-  '2024-Q1': { lc: 1.65, upstart: 1.58, sofi: 3.39, oportun: 0.35, onemain: 3.45 },
-  '2024-Q2': { lc: 1.83, upstart: 1.58, sofi: 2.99, oportun: 0.36, onemain: 3.75 },
-  '2024-Q3': { lc: 1.91, upstart: 1.58, sofi: 2.64, oportun: 0.38, onemain: 3.90 },
+  // Note: Upstart Q1-Q2 2024 corrected from placeholder $1.58B to actual reported values.
+  // SoFi Q2-Q3 2024 corrected to match official press release "personal loan originations"
+  // (prior entries understated; official: Q2=$4.20B, Q3=$4.90B incl. LPB).
+  // OneMain Q1 2024 corrected from $3.45B to $2.50B per official earnings press release.
+  '2024-Q1': { lc: 1.65, upstart: 1.04, sofi: 3.39, oportun: 0.35, onemain: 2.50 },
+  '2024-Q2': { lc: 1.83, upstart: 1.11, sofi: 4.20, oportun: 0.36, onemain: 3.60 },
+  '2024-Q3': { lc: 1.91, upstart: 1.58, sofi: 4.90, oportun: 0.38, onemain: 3.70 },
+  // Q4 2024 – Q4 2025: sourced from official earnings press releases (Jan 2025 – Feb 2026)
+  // SoFi figures are total personal loan originations including Loan Platform Business (LPB) partners.
+  // Oportun Q4 2025 not yet reported (scheduled Feb 26, 2026).
+  '2024-Q4': { lc: 1.85, upstart: 2.10, sofi: 5.30, oportun: 0.52, onemain: 3.50 },
+  '2025-Q1': { lc: 2.00, upstart: 2.10, sofi: 5.50, oportun: 0.47, onemain: 3.00 },
+  '2025-Q2': { lc: 2.40, upstart: 2.82, sofi: 7.00, oportun: 0.48, onemain: 3.90 },
+  '2025-Q3': { lc: 2.62, upstart: 2.90, sofi: 7.50, oportun: 0.51, onemain: 3.90 },
+  '2025-Q4': { lc: 2.60, upstart: 3.20, sofi: 7.50, oportun: null, onemain: 3.60 },
 };
 
 // ─────────────────────────────────────────────
