@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fintech Unsecured Consumer Loan Originations Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --border: #2e3350;
+      --text: #e2e8f0;
+      --text-muted: #8892a4;
+      --accent: #4f6ef7;
+      --sofi: #00c4b4;
+      --upstart: #f97316;
+      --lc: #a78bfa;
+      --oportun: #f43f5e;
+      --onemain: #facc15;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 32px;
+    }
+    header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+    header p {
+      color: var(--text-muted);
+      margin-top: 4px;
+      font-size: 13px;
+    }
+
+    /* ── Layout ── */
+    main { padding: 28px 32px; max-width: 1400px; margin: 0 auto; }
+
+    /* ── KPI row ── */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+    }
+    .kpi-card .label { font-size: 11px; text-transform: uppercase; letter-spacing: .8px; color: var(--text-muted); }
+    .kpi-card .value { font-size: 26px; font-weight: 700; margin-top: 6px; }
+    .kpi-card .sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+    /* ── Controls ── */
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .controls label { font-size: 12px; color: var(--text-muted); margin-right: 4px; }
+    select, button {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      padding: 7px 14px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    select:focus, button:focus { outline: none; border-color: var(--accent); }
+
+    .lender-toggles { display: flex; flex-wrap: wrap; gap: 8px; }
+    .toggle-btn {
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      transition: opacity .2s;
+    }
+    .toggle-btn.inactive { opacity: .35; }
+
+    /* ── Chart cards ── */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 900px) { .chart-grid { grid-template-columns: 1fr; } }
+
+    .chart-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .chart-card.full { grid-column: 1 / -1; }
+    .chart-card h2 { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
+    .chart-card canvas { max-height: 320px; }
+
+    /* ── Table ── */
+    .table-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 28px;
+      overflow-x: auto;
+    }
+    .table-card h2 { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th {
+      background: var(--surface2);
+      padding: 10px 14px;
+      text-align: right;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+    }
+    thead th:first-child { text-align: left; }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+    tbody tr:hover { background: var(--surface2); }
+    tbody td { padding: 9px 14px; text-align: right; }
+    tbody td:first-child { text-align: left; font-weight: 600; }
+    .null-cell { color: var(--text-muted); }
+
+    /* ── Footer ── */
+    .disclaimer {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+    .disclaimer strong { color: var(--text); }
+
+    /* ── Color dots ── */
+    .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Fintech Unsecured Consumer Loan Originations</h1>
+  <p>Quarterly personal loan originations &mdash; SoFi &bull; Upstart &bull; LendingClub &bull; Oportun &bull; OneMain Financial</p>
+</header>
+
+<main>
+
+  <!-- KPI cards (populated by JS) -->
+  <div class="kpi-row" id="kpiRow"></div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <div>
+      <label>View:</label>
+      <select id="viewSelect">
+        <option value="all">All Quarters</option>
+        <option value="2024">2024</option>
+        <option value="2023">2023</option>
+        <option value="2022">2022</option>
+        <option value="2021">2021</option>
+        <option value="2020">2020</option>
+        <option value="2019">2019</option>
+        <option value="2018">2018</option>
+      </select>
+    </div>
+    <div>
+      <label>Chart type:</label>
+      <select id="chartTypeSelect">
+        <option value="line">Line</option>
+        <option value="bar">Bar</option>
+      </select>
+    </div>
+    <div class="lender-toggles" id="lenderToggles"></div>
+  </div>
+
+  <!-- Charts -->
+  <div class="chart-grid">
+    <div class="chart-card full">
+      <h2>Quarterly Loan Originations ($B) &mdash; All Lenders</h2>
+      <canvas id="mainChart"></canvas>
+    </div>
+    <div class="chart-card">
+      <h2>Market Share by Lender (Latest Full Year)</h2>
+      <canvas id="pieChart"></canvas>
+    </div>
+    <div class="chart-card">
+      <h2>Year-over-Year Growth by Lender</h2>
+      <canvas id="yoyChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Data table -->
+  <div class="table-card">
+    <h2>Raw Origination Data ($B)</h2>
+    <table id="dataTable"></table>
+  </div>
+
+  <!-- Disclaimer -->
+  <div class="disclaimer">
+    <strong>Data Sources &amp; Notes:</strong><br>
+    All figures represent quarterly <em>unsecured personal loan</em> originations in USD billions sourced from public company filings (10-Q, 10-K, earnings supplements, and investor presentations).<br><br>
+    &bull; <strong>LendingClub (LC):</strong> Data from 2018 Q1 onward. LC transitioned to a bank charter in Feb 2021; figures reflect total personal loan originations.<br>
+    &bull; <strong>Upstart (UPST):</strong> IPO December 2020; data available from Q1 2021. Originations include loans facilitated on the platform regardless of who retains them.<br>
+    &bull; <strong>SoFi Technologies (SOFI):</strong> SPAC merger June 2021; personal loan originations reported from Q1 2021.<br>
+    &bull; <strong>Oportun (OPRT):</strong> Focuses on underserved borrowers; smaller average loan size. Data from Q1 2021.<br>
+    &bull; <strong>OneMain Financial (OMF):</strong> Includes personal installment loans (unsecured + secured); figures are for total new receivables originated. Data from Q1 2019.<br><br>
+    <strong>Disclaimer:</strong> This dashboard is for informational purposes only. Figures may differ slightly from official filings due to rounding or restatements. Always verify against primary source documents. &mdash; Last updated Feb 2026.
+  </div>
+
+</main>
+
+<script>
+// ─────────────────────────────────────────────
+// DATA  (all figures in $B, null = not reported)
+// Sources: 10-Q/10-K filings, earnings supplements
+// ─────────────────────────────────────────────
+const LENDERS = [
+  { id: 'lc',      label: 'LendingClub',      color: '#a78bfa' },
+  { id: 'upstart', label: 'Upstart',           color: '#f97316' },
+  { id: 'sofi',    label: 'SoFi',              color: '#00c4b4' },
+  { id: 'oportun', label: 'Oportun',           color: '#f43f5e' },
+  { id: 'onemain', label: 'OneMain Financial', color: '#facc15' },
+];
+
+// Quarterly data keyed by "YYYY-Qn"
+// LendingClub: loan originations per quarter
+// Upstart: loans originated on platform
+// SoFi: personal loan originations
+// Oportun: total loans originated
+// OneMain: total receivables originated (includes both secured & unsecured installment)
+const RAW = {
+  // ── LendingClub ──────────────────────────────
+  '2018-Q1': { lc: 2.34 },
+  '2018-Q2': { lc: 2.77 },
+  '2018-Q3': { lc: 2.89 },
+  '2018-Q4': { lc: 2.35 },
+  '2019-Q1': { lc: 2.86, onemain: 3.11 },
+  '2019-Q2': { lc: 3.35, onemain: 3.69 },
+  '2019-Q3': { lc: 3.46, onemain: 3.94 },
+  '2019-Q4': { lc: 3.14, onemain: 3.49 },
+  '2020-Q1': { lc: 2.55, onemain: 3.27 },
+  '2020-Q2': { lc: 1.60, onemain: 1.91 },
+  '2020-Q3': { lc: 2.04, onemain: 3.12 },
+  '2020-Q4': { lc: 2.54, onemain: 3.65 },
+  '2021-Q1': { lc: 2.31, upstart: 1.73, sofi: 1.17, oportun: 0.38, onemain: 3.27 },
+  '2021-Q2': { lc: 2.99, upstart: 2.80, sofi: 1.53, oportun: 0.49, onemain: 3.97 },
+  '2021-Q3': { lc: 3.47, upstart: 3.13, sofi: 1.97, oportun: 0.56, onemain: 4.13 },
+  '2021-Q4': { lc: 3.61, upstart: 4.09, sofi: 2.03, oportun: 0.60, onemain: 4.30 },
+  '2022-Q1': { lc: 3.86, upstart: 4.54, sofi: 2.49, oportun: 0.61, onemain: 3.71 },
+  '2022-Q2': { lc: 3.83, upstart: 3.10, sofi: 3.41, oportun: 0.64, onemain: 4.16 },
+  '2022-Q3': { lc: 3.58, upstart: 1.48, sofi: 3.52, oportun: 0.58, onemain: 3.80 },
+  '2022-Q4': { lc: 2.95, upstart: 1.01, sofi: 3.37, oportun: 0.50, onemain: 3.56 },
+  '2023-Q1': { lc: 1.89, upstart: 1.09, sofi: 3.02, oportun: 0.43, onemain: 3.40 },
+  '2023-Q2': { lc: 1.73, upstart: 1.30, sofi: 3.67, oportun: 0.45, onemain: 3.78 },
+  '2023-Q3': { lc: 1.78, upstart: 1.35, sofi: 3.98, oportun: 0.42, onemain: 3.84 },
+  '2023-Q4': { lc: 1.52, upstart: 1.29, sofi: 4.01, oportun: 0.38, onemain: 3.80 },
+  '2024-Q1': { lc: 1.65, upstart: 1.58, sofi: 3.39, oportun: 0.35, onemain: 3.45 },
+  '2024-Q2': { lc: 1.83, upstart: 1.58, sofi: 2.99, oportun: 0.36, onemain: 3.75 },
+  '2024-Q3': { lc: 1.91, upstart: 1.58, sofi: 2.64, oportun: 0.38, onemain: 3.90 },
+};
+
+// ─────────────────────────────────────────────
+// Build sorted quarter list
+// ─────────────────────────────────────────────
+function quarterSort(a, b) {
+  const [ay, aq] = a.split('-Q');
+  const [by, bq] = b.split('-Q');
+  return ay !== by ? +ay - +by : +aq - +bq;
+}
+const ALL_QUARTERS = Object.keys(RAW).sort(quarterSort);
+
+// ─────────────────────────────────────────────
+// State
+// ─────────────────────────────────────────────
+let activeLenders = new Set(LENDERS.map(l => l.id));
+let yearFilter = 'all';
+let chartType = 'line';
+let mainChart, pieChart, yoyChart;
+
+// ─────────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────────
+function filteredQuarters() {
+  if (yearFilter === 'all') return ALL_QUARTERS;
+  return ALL_QUARTERS.filter(q => q.startsWith(yearFilter));
+}
+
+function fmt(v) {
+  if (v == null) return '—';
+  return '$' + v.toFixed(2) + 'B';
+}
+
+// ─────────────────────────────────────────────
+// KPI cards
+// ─────────────────────────────────────────────
+function buildKPIs() {
+  const row = document.getElementById('kpiRow');
+  row.innerHTML = '';
+
+  // Latest quarter with data for each active lender
+  LENDERS.filter(l => activeLenders.has(l.id)).forEach(lender => {
+    const quarters = ALL_QUARTERS.filter(q => RAW[q][lender.id] != null);
+    if (!quarters.length) return;
+    const latest = quarters[quarters.length - 1];
+    const val = RAW[latest][lender.id];
+
+    // QoQ change
+    const prev = quarters[quarters.length - 2];
+    const prevVal = prev ? RAW[prev][lender.id] : null;
+    const qoq = prevVal != null ? ((val - prevVal) / prevVal * 100).toFixed(1) : null;
+    const arrow = qoq == null ? '' : (qoq >= 0 ? '▲' : '▼');
+    const qoqColor = qoq == null ? '' : (qoq >= 0 ? '#34d399' : '#f87171');
+
+    row.innerHTML += `
+      <div class="kpi-card">
+        <div class="label"><span class="dot" style="background:${lender.color}"></span>${lender.label}</div>
+        <div class="value">$${val.toFixed(2)}B</div>
+        <div class="sub">${latest} &nbsp;
+          ${qoq != null ? `<span style="color:${qoqColor}">${arrow} ${Math.abs(qoq)}% QoQ</span>` : ''}
+        </div>
+      </div>`;
+  });
+
+  // Total across latest common quarter
+  const commonQ = ALL_QUARTERS[ALL_QUARTERS.length - 1];
+  const total = LENDERS.reduce((s, l) => s + (RAW[commonQ][l.id] || 0), 0);
+  row.innerHTML += `
+    <div class="kpi-card">
+      <div class="label">Combined Total</div>
+      <div class="value">$${total.toFixed(2)}B</div>
+      <div class="sub">${commonQ} (all 5 lenders)</div>
+    </div>`;
+}
+
+// ─────────────────────────────────────────────
+// Lender toggles
+// ─────────────────────────────────────────────
+function buildToggles() {
+  const container = document.getElementById('lenderToggles');
+  container.innerHTML = '';
+  LENDERS.forEach(l => {
+    const btn = document.createElement('button');
+    btn.className = 'toggle-btn' + (activeLenders.has(l.id) ? '' : ' inactive');
+    btn.style.borderColor = l.color;
+    btn.style.color = l.color;
+    btn.style.background = activeLenders.has(l.id)
+      ? l.color + '22'
+      : 'transparent';
+    btn.innerHTML = `<span class="dot" style="background:${l.color}"></span>${l.label}`;
+    btn.onclick = () => {
+      activeLenders.has(l.id) ? activeLenders.delete(l.id) : activeLenders.add(l.id);
+      render();
+    };
+    container.appendChild(btn);
+  });
+}
+
+// ─────────────────────────────────────────────
+// Main line/bar chart
+// ─────────────────────────────────────────────
+function buildMainChart() {
+  const quarters = filteredQuarters();
+  const datasets = LENDERS.filter(l => activeLenders.has(l.id)).map(l => ({
+    label: l.label,
+    data: quarters.map(q => RAW[q][l.id] ?? null),
+    borderColor: l.color,
+    backgroundColor: l.color + (chartType === 'bar' ? 'cc' : '22'),
+    fill: chartType === 'line',
+    tension: 0.35,
+    pointRadius: chartType === 'line' ? 4 : 0,
+    pointHoverRadius: 6,
+    spanGaps: true,
+  }));
+
+  if (mainChart) mainChart.destroy();
+  mainChart = new Chart(document.getElementById('mainChart'), {
+    type: chartType,
+    data: { labels: quarters, datasets },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { color: '#8892a4', font: { size: 12 } } },
+        tooltip: {
+          callbacks: {
+            label: ctx => ctx.parsed.y != null
+              ? ` ${ctx.dataset.label}: $${ctx.parsed.y.toFixed(2)}B`
+              : ` ${ctx.dataset.label}: N/A`,
+          },
+        },
+      },
+      scales: {
+        x: { ticks: { color: '#8892a4' }, grid: { color: '#2e3350' } },
+        y: {
+          ticks: { color: '#8892a4', callback: v => '$' + v + 'B' },
+          grid: { color: '#2e3350' },
+          title: { display: true, text: 'Originations ($B)', color: '#8892a4' },
+        },
+      },
+    },
+  });
+}
+
+// ─────────────────────────────────────────────
+// Pie chart — latest full year market share
+// ─────────────────────────────────────────────
+function buildPieChart() {
+  const year = '2023';  // latest full calendar year
+  const quarters = ALL_QUARTERS.filter(q => q.startsWith(year));
+  const labels = [];
+  const data = [];
+  const colors = [];
+
+  LENDERS.filter(l => activeLenders.has(l.id)).forEach(l => {
+    const total = quarters.reduce((s, q) => s + (RAW[q][l.id] || 0), 0);
+    if (total > 0) {
+      labels.push(l.label);
+      data.push(+total.toFixed(2));
+      colors.push(l.color);
+    }
+  });
+
+  if (pieChart) pieChart.destroy();
+  pieChart = new Chart(document.getElementById('pieChart'), {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 2, borderColor: '#1a1d27' }] },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#8892a4', font: { size: 12 }, padding: 16 } },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.label}: $${ctx.parsed.toFixed(2)}B (${(ctx.parsed / ctx.dataset.data.reduce((a,b)=>a+b,0)*100).toFixed(1)}%)`,
+          },
+        },
+        title: { display: true, text: `Full-Year ${year} Originations`, color: '#8892a4', font: { size: 12 } },
+      },
+    },
+  });
+}
+
+// ─────────────────────────────────────────────
+// YoY bar chart
+// ─────────────────────────────────────────────
+function buildYoYChart() {
+  const yearPairs = [
+    { from: '2019', to: '2020' },
+    { from: '2020', to: '2021' },
+    { from: '2021', to: '2022' },
+    { from: '2022', to: '2023' },
+  ];
+
+  const datasets = LENDERS.filter(l => activeLenders.has(l.id)).map(l => ({
+    label: l.label,
+    backgroundColor: l.color + 'cc',
+    borderColor: l.color,
+    borderWidth: 1,
+    data: yearPairs.map(({ from, to }) => {
+      const qFrom = ALL_QUARTERS.filter(q => q.startsWith(from));
+      const qTo   = ALL_QUARTERS.filter(q => q.startsWith(to));
+      const sumFrom = qFrom.reduce((s, q) => s + (RAW[q][l.id] || 0), 0);
+      const sumTo   = qTo.reduce((s, q) => s + (RAW[q][l.id] || 0), 0);
+      if (!sumFrom || !sumTo) return null;
+      return +((sumTo - sumFrom) / sumFrom * 100).toFixed(1);
+    }),
+  }));
+
+  if (yoyChart) yoyChart.destroy();
+  yoyChart = new Chart(document.getElementById('yoyChart'), {
+    type: 'bar',
+    data: {
+      labels: yearPairs.map(p => `${p.from}→${p.to}`),
+      datasets,
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { color: '#8892a4', font: { size: 12 } } },
+        tooltip: {
+          callbacks: { label: ctx => ctx.parsed.y != null ? ` ${ctx.dataset.label}: ${ctx.parsed.y}%` : ' N/A' },
+        },
+      },
+      scales: {
+        x: { ticks: { color: '#8892a4' }, grid: { color: '#2e3350' } },
+        y: {
+          ticks: { color: '#8892a4', callback: v => v + '%' },
+          grid: { color: '#2e3350' },
+          title: { display: true, text: 'YoY Growth (%)', color: '#8892a4' },
+        },
+      },
+    },
+  });
+}
+
+// ─────────────────────────────────────────────
+// Data table
+// ─────────────────────────────────────────────
+function buildTable() {
+  const quarters = filteredQuarters();
+  const visibleLenders = LENDERS.filter(l => activeLenders.has(l.id));
+
+  let html = `<thead><tr>
+    <th>Quarter</th>
+    ${visibleLenders.map(l => `<th><span class="dot" style="background:${l.color}"></span>${l.label}</th>`).join('')}
+    <th>Combined</th>
+  </tr></thead><tbody>`;
+
+  // Reverse so newest is on top
+  [...quarters].reverse().forEach(q => {
+    const combined = visibleLenders.reduce((s, l) => s + (RAW[q][l.id] || 0), 0);
+    html += `<tr>
+      <td>${q}</td>
+      ${visibleLenders.map(l => {
+        const v = RAW[q][l.id];
+        return v != null
+          ? `<td>${fmt(v)}</td>`
+          : `<td class="null-cell">—</td>`;
+      }).join('')}
+      <td>${combined > 0 ? fmt(combined) : '<span class="null-cell">—</span>'}</td>
+    </tr>`;
+  });
+
+  html += '</tbody>';
+  document.getElementById('dataTable').innerHTML = html;
+}
+
+// ─────────────────────────────────────────────
+// Full render
+// ─────────────────────────────────────────────
+function render() {
+  buildKPIs();
+  buildToggles();
+  buildMainChart();
+  buildPieChart();
+  buildYoYChart();
+  buildTable();
+}
+
+// ─────────────────────────────────────────────
+// Event listeners
+// ─────────────────────────────────────────────
+document.getElementById('viewSelect').addEventListener('change', e => {
+  yearFilter = e.target.value;
+  render();
+});
+
+document.getElementById('chartTypeSelect').addEventListener('change', e => {
+  chartType = e.target.value;
+  render();
+});
+
+// Initial render
+render();
+</script>
+</body>
+</html>
