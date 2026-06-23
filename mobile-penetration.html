@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Global Mobile Phone Penetration</title>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --border: #2e3350;
+      --text: #e2e8f0;
+      --text-muted: #8892a4;
+      --accent: #4f6ef7;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      min-height: 100vh;
+    }
+    header {
+      padding: 20px 28px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    header .logo {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: #fff;
+    }
+    header .logo span { color: var(--accent); }
+    header h1 {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-muted);
+      border-left: 1px solid var(--border);
+      padding-left: 16px;
+    }
+    .main { padding: 24px 28px; }
+    .tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 4px;
+      width: fit-content;
+      margin-bottom: 24px;
+    }
+    .tab {
+      padding: 8px 20px;
+      border-radius: 7px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .tab.active {
+      background: var(--accent);
+      color: #fff;
+    }
+    .tab:hover:not(.active) { background: var(--surface2); color: var(--text); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .grid.single { grid-template-columns: 1fr; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 14px 18px 10px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .card-year {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .card-body { padding: 0; position: relative; }
+    .map-container { width: 100%; }
+    .map-container svg { display: block; width: 100%; height: auto; }
+
+    .legend {
+      padding: 10px 18px 12px;
+      border-top: 1px solid var(--border);
+    }
+    .legend svg { display: block; width: 100%; overflow: visible; }
+
+    .tooltip {
+      position: fixed;
+      background: #1e2235;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      pointer-events: none;
+      font-size: 12px;
+      z-index: 1000;
+      min-width: 160px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+    .tooltip-country { font-weight: 600; font-size: 13px; margin-bottom: 4px; }
+    .tooltip-pct { font-size: 18px; font-weight: 700; color: var(--accent); }
+    .tooltip-label { color: var(--text-muted); font-size: 11px; }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 18px;
+    }
+    .stat-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+    .stat-value { font-size: 24px; font-weight: 700; color: var(--accent); }
+    .stat-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    .comparison-section { margin-top: 16px; }
+    .section-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .bar-list { display: flex; flex-direction: column; gap: 6px; }
+    .bar-row { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+    .bar-label { width: 130px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bar-track { flex: 1; height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; position: relative; }
+    .bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+    .bar-pct { width: 38px; text-align: right; color: var(--text-muted); font-size: 11px; }
+
+    .view-toggle {
+      display: flex;
+      gap: 4px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 3px;
+    }
+    .view-btn {
+      padding: 5px 12px;
+      border-radius: 5px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .view-btn.active { background: var(--surface); color: var(--text); }
+
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="logo">Tiger<span>Global</span></div>
+  <h1>Global Mobile Phone Penetration</h1>
+</header>
+
+<div class="main">
+  <div class="tabs">
+    <button class="tab active" onclick="setView('quad')">4-Panel View</button>
+    <button class="tab" onclick="setView('single')">Single Year</button>
+    <button class="tab" onclick="setView('trend')">Trend Analysis</button>
+  </div>
+
+  <div id="view-quad">
+    <div class="stats-row" id="global-stats"></div>
+    <div class="grid" id="quad-grid"></div>
+  </div>
+
+  <div id="view-single" style="display:none">
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+      <span style="color:var(--text-muted); font-size:13px;">Year:</span>
+      <div class="tabs" style="margin-bottom:0">
+        <button class="tab active" onclick="setSingleYear(2005)">2005</button>
+        <button class="tab" onclick="setSingleYear(2015)">2015</button>
+        <button class="tab" onclick="setSingleYear(2020)">2020</button>
+        <button class="tab" onclick="setSingleYear(2025)">2025</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title" id="single-title">Mobile Penetration — 2005</span>
+        <span class="card-year" id="single-year-label">2005</span>
+      </div>
+      <div class="card-body">
+        <div class="map-container" id="single-map"></div>
+      </div>
+      <div class="legend" id="single-legend"></div>
+    </div>
+  </div>
+
+  <div id="view-trend" style="display:none">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Top Gainers (2005 → 2025)</span></div>
+        <div class="card-body" style="padding:16px" id="top-gainers"></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">2025 Leaders by Region</span></div>
+        <div class="card-body" style="padding:16px" id="regional-leaders"></div>
+      </div>
+      <div class="card" style="grid-column:1/-1">
+        <div class="card-header"><span class="card-title">Global Penetration Over Time</span></div>
+        <div class="card-body" style="padding:20px" id="timeline-chart"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tooltip" id="tooltip" style="display:none"></div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+// Mobile cellular subscriptions per 100 people (ITU / World Bank data, ~2005/2015/2020/2025)
+// Values can exceed 100 due to multi-SIM users
+const DATA = {
+  2005: {
+    AFG:10,ALB:43,DZA:41,AGO:9,ARG:57,ARM:11,AUS:89,AUT:103,AZE:32,BGD:6,
+    BLR:35,BEL:92,BEN:5,BTN:2,BOL:22,BIH:47,BWA:30,BRA:47,BRN:52,BGR:89,
+    BFA:3,BDI:1,KHM:7,CMR:8,CAN:55,CAF:1,TCD:2,CHL:65,CHN:30,COL:47,
+    COD:3,COG:8,CRI:25,HRV:83,CUB:2,CYP:86,CZE:107,DNK:102,DOM:39,ECU:45,
+    EGY:18,SLV:33,ETH:1,FIN:105,FRA:79,GAB:44,GMB:12,GEO:28,DEU:96,GHA:12,
+    GRC:94,GTM:29,GIN:2,HND:21,HKG:122,HUN:93,IND:8,IDN:22,IRN:9,IRQ:9,
+    IRL:101,ISR:115,ITA:123,JAM:70,JPN:76,JOR:27,KAZ:37,KEN:9,PRK:0,KOR:80,
+    KWT:106,KGZ:10,LAO:8,LBN:24,LBR:3,LBY:15,LTU:131,LUX:147,MKD:53,MDG:3,
+    MWI:2,MYS:75,MDV:54,MLI:3,MLT:84,MRT:15,MEX:44,MDA:30,MNG:16,MAR:41,
+    MOZ:4,MMR:1,NAM:18,NPL:2,NLD:96,NZL:86,NIC:15,NER:1,NGA:13,NOR:109,
+    OMN:46,PAK:10,PAN:43,PNG:2,PRY:31,PER:21,PHL:41,POL:76,PRT:107,PRI:71,
+    QAT:96,ROU:61,RUS:85,RWA:2,SAU:57,SEN:15,SLE:2,SGP:98,SVK:80,SVN:87,
+    SOM:5,ZAF:72,ESP:100,LKA:14,SDN:6,SWE:102,SWZ:18,SYR:12,TWN:86,TJK:3,
+    TZA:5,THA:44,TGO:5,TUN:55,TUR:60,TKM:4,UGA:4,UKR:60,ARE:96,GBR:109,
+    USA:68,URY:40,UZB:7,VEN:47,VNM:11,YEM:7,ZMB:6,ZWE:4,
+    NOR:109,SWE:102,FIN:105,DNK:102,ISL:99,EST:108,LVA:77,
+    CIV:14,GNB:7,LSO:10,SWZ:18,NAM:18,ZAF:72,BWA:30,ZMB:6,ZWE:4,
+    HTI:5,TTO:59,GUY:30,SUR:57,
+  },
+  2015: {
+    AFG:62,ALB:112,DZA:106,AGO:63,ARG:143,ARM:117,AUS:131,AUT:154,AZE:109,BGD:80,
+    BLR:122,BEL:111,BEN:80,BTN:80,BOL:92,BIH:92,BWA:164,BRA:126,BRN:116,BGR:130,
+    BFA:62,BDI:27,KHM:132,CMR:73,CAN:82,CAF:27,TCD:36,CHL:130,CHN:92,COL:116,
+    COD:43,COG:95,CRI:148,HRV:100,CUB:28,CYP:141,CZE:130,DNK:130,DOM:87,ECU:108,
+    EGY:113,SLV:145,ETH:39,FIN:140,FRA:100,GAB:176,GMB:138,GEO:130,DEU:119,GHA:118,
+    GRC:115,GTM:111,GIN:70,HND:96,HKG:232,HUN:119,IND:78,IDN:136,IRN:93,IRQ:86,
+    IRL:102,ISR:129,ITA:154,JAM:109,JPN:120,JOR:179,KAZ:167,KEN:79,PRK:8,KOR:119,
+    KWT:232,KGZ:133,LAO:57,LBN:84,LBR:57,LBY:155,LTU:148,LUX:146,MKD:108,MDG:43,
+    MWI:32,MYS:148,MDV:202,MLI:137,MLT:127,MRT:101,MEX:86,MDA:104,MNG:100,MAR:129,
+    MOZ:64,MMR:87,NAM:107,NPL:88,NLD:116,NZL:112,NIC:121,NER:37,NGA:82,NOR:116,
+    OMN:158,PAK:68,PAN:165,PNG:41,PRY:110,PER:110,PHL:116,POL:148,PRT:115,PRI:80,
+    QAT:143,ROU:106,RUS:176,RWA:65,SAU:179,SEN:98,SLE:67,SGP:147,SVK:121,SVN:113,
+    SOM:51,ZAF:150,ESP:108,LKA:107,SDN:72,SWE:130,SWZ:80,SYR:69,TWN:124,TJK:101,
+    TZA:72,THA:148,TGO:78,TUN:128,TUR:95,TKM:79,UGA:52,UKR:145,ARE:208,GBR:124,
+    USA:98,URY:160,UZB:74,VEN:100,VNM:131,YEM:68,ZMB:75,ZWE:83,
+    EST:155,LVA:130,CIV:108,GNB:70,LSO:84,HTI:58,TTO:147,GUY:69,SUR:106,
+  },
+  2020: {
+    AFG:59,ALB:107,DZA:113,AGO:46,ARG:133,ARM:117,AUS:109,AUT:120,AZE:107,BGD:100,
+    BLR:127,BEL:104,BEN:91,BTN:90,BOL:98,BIH:106,BWA:166,BRA:104,BRN:133,BGR:133,
+    BFA:97,BDI:48,KHM:120,CMR:85,CAN:87,CAF:32,TCD:46,CHL:131,CHN:121,COL:130,
+    COD:44,COG:107,CRI:164,HRV:105,CUB:59,CYP:157,CZE:123,DNK:127,DOM:91,ECU:106,
+    EGY:96,SLV:149,ETH:47,FIN:142,FRA:110,GAB:160,GMB:97,GEO:130,DEU:128,GHA:132,
+    GRC:115,GTM:116,GIN:82,HND:62,HKG:294,HUN:110,IND:84,IDN:130,IRN:97,IRQ:89,
+    IRL:111,ISR:149,ITA:130,JAM:109,JPN:175,JOR:88,KAZ:142,KEN:109,PRK:15,KOR:137,
+    KWT:168,KGZ:133,LAO:68,LBN:78,LBR:56,LBY:175,LTU:143,LUX:127,MKD:99,MDG:51,
+    MWI:44,MYS:142,MDV:176,MLI:103,MLT:130,MRT:112,MEX:90,MDA:107,MNG:121,MAR:134,
+    MOZ:48,MMR:107,NAM:117,NPL:113,NLD:121,NZL:127,NIC:113,NER:49,NGA:87,NOR:108,
+    OMN:143,PAK:79,PAN:122,PNG:47,PRY:106,PER:126,PHL:139,POL:131,PRT:118,PRI:74,
+    QAT:141,ROU:117,RUS:164,RWA:79,SAU:131,SEN:106,SLE:62,SGP:164,SVK:123,SVN:117,
+    SOM:52,ZAF:162,ESP:118,LKA:138,SDN:73,SWE:128,SWZ:93,SYR:59,TWN:131,TJK:110,
+    TZA:83,THA:187,TGO:82,TUN:128,TUR:97,TKM:79,UGA:57,UKR:133,ARE:189,GBR:118,
+    USA:106,URY:161,UZB:93,VEN:61,VNM:142,YEM:70,ZMB:84,ZWE:91,
+    EST:157,LVA:131,CIV:117,GNB:75,LSO:91,HTI:65,TTO:141,GUY:82,SUR:123,
+  },
+  2025: {
+    AFG:62,ALB:112,DZA:118,AGO:55,ARG:141,ARM:120,AUS:117,AUT:122,AZE:112,BGD:109,
+    BLR:131,BEL:108,BEN:98,BTN:95,BOL:107,BIH:110,BWA:172,BRA:112,BRN:138,BGR:140,
+    BFA:105,BDI:55,KHM:125,CMR:92,CAN:92,CAF:38,TCD:54,CHL:136,CHN:126,COL:136,
+    COD:52,COG:112,CRI:167,HRV:110,CUB:64,CYP:160,CZE:127,DNK:131,DOM:97,ECU:112,
+    EGY:101,SLV:152,ETH:53,FIN:145,FRA:115,GAB:163,GMB:103,GEO:135,DEU:131,GHA:139,
+    GRC:118,GTM:121,GIN:88,HND:68,HKG:298,HUN:115,IND:88,IDN:135,IRN:101,IRQ:95,
+    IRL:114,ISR:152,ITA:135,JAM:112,JPN:182,JOR:91,KAZ:148,KEN:115,PRK:18,KOR:141,
+    KWT:172,KGZ:138,LAO:73,LBN:82,LBR:60,LBY:178,LTU:148,LUX:131,MKD:102,MDG:56,
+    MWI:50,MYS:148,MDV:182,MLI:109,MLT:135,MRT:118,MEX:96,MDA:112,MNG:127,MAR:140,
+    MOZ:53,MMR:112,NAM:122,NPL:118,NLD:125,NZL:132,NIC:118,NER:55,NGA:93,NOR:112,
+    OMN:148,PAK:85,PAN:128,PNG:52,PRY:112,PER:131,PHL:145,POL:137,PRT:122,PRI:78,
+    QAT:148,ROU:122,RUS:168,RWA:84,SAU:136,SEN:112,SLE:68,SGP:168,SVK:127,SVN:122,
+    SOM:57,ZAF:168,ESP:122,LKA:143,SDN:78,SWE:133,SWZ:98,SYR:63,TWN:136,TJK:115,
+    TZA:89,THA:192,TGO:87,TUN:133,TUR:102,TKM:84,UGA:63,UKR:138,ARE:195,GBR:122,
+    USA:112,URY:164,UZB:98,VEN:66,VNM:148,YEM:74,ZMB:89,ZWE:97,
+    EST:160,LVA:135,CIV:122,GNB:80,LSO:97,HTI:70,TTO:148,GUY:87,SUR:128,
+    NOR:112,SWE:133,FIN:145,DNK:131,ISL:103,
+  }
+};
+
+const YEARS = [2005, 2015, 2020, 2025];
+
+const COUNTRY_NAMES = {
+  AFG:"Afghanistan",ALB:"Albania",DZA:"Algeria",AGO:"Angola",ARG:"Argentina",
+  ARM:"Armenia",AUS:"Australia",AUT:"Austria",AZE:"Azerbaijan",BGD:"Bangladesh",
+  BLR:"Belarus",BEL:"Belgium",BEN:"Benin",BOL:"Bolivia",BIH:"Bosnia & Herz.",
+  BWA:"Botswana",BRA:"Brazil",BRN:"Brunei",BGR:"Bulgaria",BFA:"Burkina Faso",
+  BDI:"Burundi",KHM:"Cambodia",CMR:"Cameroon",CAN:"Canada",CAF:"Cent. Afr. Rep.",
+  TCD:"Chad",CHL:"Chile",CHN:"China",COL:"Colombia",COD:"DR Congo",
+  COG:"Congo",CRI:"Costa Rica",HRV:"Croatia",CUB:"Cuba",CYP:"Cyprus",
+  CZE:"Czech Republic",DNK:"Denmark",DOM:"Dom. Republic",ECU:"Ecuador",
+  EGY:"Egypt",SLV:"El Salvador",ETH:"Ethiopia",FIN:"Finland",FRA:"France",
+  GAB:"Gabon",GMB:"Gambia",GEO:"Georgia",DEU:"Germany",GHA:"Ghana",
+  GRC:"Greece",GTM:"Guatemala",GIN:"Guinea",HND:"Honduras",HKG:"Hong Kong",
+  HUN:"Hungary",IND:"India",IDN:"Indonesia",IRN:"Iran",IRQ:"Iraq",
+  IRL:"Ireland",ISR:"Israel",ITA:"Italy",JAM:"Jamaica",JPN:"Japan",
+  JOR:"Jordan",KAZ:"Kazakhstan",KEN:"Kenya",PRK:"North Korea",KOR:"South Korea",
+  KWT:"Kuwait",KGZ:"Kyrgyzstan",LAO:"Laos",LBN:"Lebanon",LBR:"Liberia",
+  LBY:"Libya",LTU:"Lithuania",LUX:"Luxembourg",MKD:"N. Macedonia",MDG:"Madagascar",
+  MWI:"Malawi",MYS:"Malaysia",MDV:"Maldives",MLI:"Mali",MLT:"Malta",
+  MRT:"Mauritania",MEX:"Mexico",MDA:"Moldova",MNG:"Mongolia",MAR:"Morocco",
+  MOZ:"Mozambique",MMR:"Myanmar",NAM:"Namibia",NPL:"Nepal",NLD:"Netherlands",
+  NZL:"New Zealand",NIC:"Nicaragua",NER:"Niger",NGA:"Nigeria",NOR:"Norway",
+  OMN:"Oman",PAK:"Pakistan",PAN:"Panama",PNG:"Papua New Guinea",PRY:"Paraguay",
+  PER:"Peru",PHL:"Philippines",POL:"Poland",PRT:"Portugal",QAT:"Qatar",
+  ROU:"Romania",RUS:"Russia",RWA:"Rwanda",SAU:"Saudi Arabia",SEN:"Senegal",
+  SLE:"Sierra Leone",SGP:"Singapore",SVK:"Slovakia",SVN:"Slovenia",
+  SOM:"Somalia",ZAF:"South Africa",ESP:"Spain",LKA:"Sri Lanka",SDN:"Sudan",
+  SWE:"Sweden",SWZ:"Eswatini",SYR:"Syria",TWN:"Taiwan",TJK:"Tajikistan",
+  TZA:"Tanzania",THA:"Thailand",TGO:"Togo",TUN:"Tunisia",TUR:"Turkey",
+  TKM:"Turkmenistan",UGA:"Uganda",UKR:"Ukraine",ARE:"UAE",GBR:"United Kingdom",
+  USA:"United States",URY:"Uruguay",UZB:"Uzbekistan",VEN:"Venezuela",
+  VNM:"Vietnam",YEM:"Yemen",ZMB:"Zambia",ZWE:"Zimbabwe",
+  EST:"Estonia",LVA:"Latvia",CIV:"Côte d'Ivoire",GNB:"Guinea-Bissau",
+  LSO:"Lesotho",HTI:"Haiti",TTO:"Trinidad & Tobago",GUY:"Guyana",SUR:"Suriname",ISL:"Iceland",
+};
+
+// Single source of truth for the color scale.
+// Each entry: [value (subscriptions per 100), [R, G, B]]
+const COLOR_STOPS = [
+  [0,   [22,  36,  71]],   // deep navy   – near-zero penetration
+  [20,  [21,  101, 192]],  // royal blue  – emerging
+  [40,  [30,  136, 229]],  // sky blue    – early majority
+  [60,  [0,   188, 212]],  // cyan        – growing
+  [80,  [0,   150, 136]],  // teal        – widespread
+  [100, [76,  175, 80]],   // green       – ~fully penetrated
+  [115, [255, 235, 59]],   // yellow      – multi-SIM (>1 sub/person)
+  [130, [255, 87,  34]],   // deep orange – very high multi-SIM
+];
+
+function getColor(val) {
+  if (val === null || val === undefined) return '#2a2d3e';
+  const v = Math.min(val, COLOR_STOPS[COLOR_STOPS.length - 1][0]);
+  let i = COLOR_STOPS.findIndex(s => s[0] >= v);
+  if (i <= 0) return `rgb(${COLOR_STOPS[0][1].join(',')})`;
+  if (i >= COLOR_STOPS.length) return `rgb(${COLOR_STOPS[COLOR_STOPS.length-1][1].join(',')})`;
+  const [v0, c0] = COLOR_STOPS[i-1];
+  const [v1, c1] = COLOR_STOPS[i];
+  const t = (v - v0) / (v1 - v0);
+  const r = Math.round(c0[0] + t * (c1[0] - c0[0]));
+  const g = Math.round(c0[1] + t * (c1[1] - c0[1]));
+  const b = Math.round(c0[2] + t * (c1[2] - c0[2]));
+  return `rgb(${r},${g},${b})`;
+}
+
+// Builds an SVG legend strip driven by COLOR_STOPS — always in sync with the map.
+function buildLegendSVG(compact = false) {
+  const W = 400, barH = compact ? 10 : 13, topPad = 2, tickH = 5, textY = barH + tickH + 10;
+  const svgH = textY + 12;
+  const maxVal = COLOR_STOPS[COLOR_STOPS.length - 1][0];
+  const gradId = 'cg' + Math.random().toString(36).slice(2);
+
+  const stopMarkup = COLOR_STOPS.map(([v, rgb]) =>
+    `<stop offset="${(v / maxVal * 100).toFixed(1)}%" stop-color="rgb(${rgb.join(',')})"/>`
+  ).join('');
+
+  // Tick positions: every 20 units
+  const ticks = [];
+  for (let v = 0; v <= maxVal; v += 20) ticks.push(v);
+
+  const tickMarkup = ticks.map(v => {
+    const x = (v / maxVal * W).toFixed(1);
+    const label = v === 0 ? '0%' : v >= maxVal ? `${maxVal}%+` : `${v}%`;
+    return `
+      <line x1="${x}" y1="${barH + topPad}" x2="${x}" y2="${barH + topPad + tickH}" stroke="#4a5270" stroke-width="1"/>
+      <text x="${x}" y="${textY}" text-anchor="middle" fill="#8892a4" font-size="${compact ? 9 : 10}" font-family="system-ui,sans-serif">${label}</text>`;
+  }).join('');
+
+  // No-data swatch
+  const swatchX = W + 20;
+  const noDataMarkup = `
+    <rect x="${swatchX}" y="${topPad}" width="${barH + 4}" height="${barH}" rx="2" fill="#2a2d3e" stroke="#4a5270" stroke-width="0.8"/>
+    <text x="${swatchX + barH + 8}" y="${topPad + barH - 2}" fill="#8892a4" font-size="${compact ? 9 : 10}" font-family="system-ui,sans-serif">No data</text>`;
+
+  return `
+    <svg viewBox="0 0 ${W + 90} ${svgH}" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <linearGradient id="${gradId}" x1="0" x2="1" y1="0" y2="0">
+          ${stopMarkup}
+        </linearGradient>
+      </defs>
+      <rect x="0" y="${topPad}" width="${W}" height="${barH}" rx="3" fill="url(#${gradId})"/>
+      ${tickMarkup}
+      ${noDataMarkup}
+    </svg>`;
+}
+
+let worldData = null;
+let currentView = 'quad';
+let currentSingleYear = 2005;
+
+async function loadMap() {
+  const res = await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json');
+  worldData = await res.json();
+  renderAll();
+}
+
+// ISO numeric → alpha3 lookup table
+const NUM_TO_ALPHA3 = {
+  4:"AFG",8:"ALB",12:"DZA",24:"AGO",32:"ARG",51:"ARM",36:"AUS",40:"AUT",31:"AZE",
+  50:"BGD",112:"BLR",56:"BEL",204:"BEN",64:"BTN",68:"BOL",70:"BIH",72:"BWA",76:"BRA",
+  96:"BRN",100:"BGR",854:"BFA",108:"BDI",116:"KHM",120:"CMR",124:"CAN",140:"CAF",
+  148:"TCD",152:"CHL",156:"CHN",170:"COL",180:"COD",178:"COG",188:"CRI",191:"HRV",
+  192:"CUB",196:"CYP",203:"CZE",208:"DNK",214:"DOM",218:"ECU",818:"EGY",222:"SLV",
+  231:"ETH",246:"FIN",250:"FRA",266:"GAB",270:"GMB",268:"GEO",276:"DEU",288:"GHA",
+  300:"GRC",320:"GTM",324:"GIN",340:"HND",344:"HKG",348:"HUN",356:"IND",360:"IDN",
+  364:"IRN",368:"IRQ",372:"IRL",376:"ISR",380:"ITA",388:"JAM",392:"JPN",400:"JOR",
+  398:"KAZ",404:"KEN",408:"PRK",410:"KOR",414:"KWT",417:"KGZ",418:"LAO",422:"LBN",
+  430:"LBR",434:"LBY",440:"LTU",442:"LUX",807:"MKD",450:"MDG",454:"MWI",458:"MYS",
+  462:"MDV",466:"MLI",470:"MLT",478:"MRT",484:"MEX",498:"MDA",496:"MNG",504:"MAR",
+  508:"MOZ",104:"MMR",516:"NAM",524:"NPL",528:"NLD",554:"NZL",558:"NIC",562:"NER",
+  566:"NGA",578:"NOR",512:"OMN",586:"PAK",591:"PAN",598:"PNG",600:"PRY",604:"PER",
+  608:"PHL",616:"POL",620:"PRT",630:"PRI",634:"QAT",642:"ROU",643:"RUS",646:"RWA",
+  682:"SAU",686:"SEN",694:"SLE",702:"SGP",703:"SVK",705:"SVN",706:"SOM",710:"ZAF",
+  724:"ESP",144:"LKA",729:"SDN",752:"SWE",748:"SWZ",760:"SYR",158:"TWN",762:"TJK",
+  834:"TZA",764:"THA",768:"TGO",788:"TUN",792:"TUR",795:"TKM",800:"UGA",804:"UKR",
+  784:"ARE",826:"GBR",840:"USA",858:"URY",860:"UZB",862:"VEN",704:"VNM",887:"YEM",
+  894:"ZMB",716:"ZWE",233:"EST",428:"LVA",384:"CIV",624:"GNB",426:"LSO",332:"HTI",
+  780:"TTO",328:"GUY",740:"SUR",352:"ISL",246:"FIN",
+};
+
+function drawMap(containerId, year, width) {
+  const data = DATA[year];
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+
+  const h = Math.round(width * 0.52);
+  const svg = d3.select(`#${containerId}`)
+    .append('svg')
+    .attr('viewBox', `0 0 ${width} ${h}`)
+    .attr('preserveAspectRatio', 'xMidYMid meet');
+
+  const projection = d3.geoNaturalEarth1()
+    .scale(width / 6.4)
+    .translate([width / 2, h / 2]);
+
+  const path = d3.geoPath().projection(projection);
+  const countries = topojson.feature(worldData, worldData.objects.countries);
+
+  const tooltip = document.getElementById('tooltip');
+
+  svg.selectAll('path')
+    .data(countries.features)
+    .join('path')
+    .attr('d', path)
+    .attr('fill', d => {
+      const alpha3 = NUM_TO_ALPHA3[+d.id];
+      const val = alpha3 ? data[alpha3] : null;
+      return getColor(val);
+    })
+    .attr('stroke', '#0f1117')
+    .attr('stroke-width', 0.4)
+    .on('mousemove', function(event, d) {
+      const alpha3 = NUM_TO_ALPHA3[+d.id];
+      const val = alpha3 ? data[alpha3] : null;
+      const name = COUNTRY_NAMES[alpha3] || alpha3 || 'Unknown';
+      tooltip.style.display = 'block';
+      tooltip.style.left = (event.clientX + 14) + 'px';
+      tooltip.style.top = (event.clientY - 10) + 'px';
+      tooltip.innerHTML = `
+        <div class="tooltip-country">${name}</div>
+        <div class="tooltip-pct">${val !== null && val !== undefined ? val + '%' : 'No data'}</div>
+        <div class="tooltip-label">Mobile subscriptions per 100 people · ${year}</div>
+      `;
+    })
+    .on('mouseleave', () => { tooltip.style.display = 'none'; });
+}
+
+function renderQuad() {
+  const grid = document.getElementById('quad-grid');
+  grid.innerHTML = '';
+  const statsRow = document.getElementById('global-stats');
+  statsRow.innerHTML = '';
+
+  // Global avg for each year
+  const yearLabels = {2005:'20 Years Ago',2015:'10 Years Ago',2020:'5 Years Ago',2025:'Today'};
+  YEARS.forEach(year => {
+    const vals = Object.values(DATA[year]);
+    const avg = Math.round(vals.reduce((a,b) => a+b, 0) / vals.length);
+    const stat = document.createElement('div');
+    stat.className = 'stat-card';
+    stat.innerHTML = `
+      <div class="stat-label">${yearLabels[year]}</div>
+      <div class="stat-value">${avg}%</div>
+      <div class="stat-sub">Avg. subscriptions / 100 people · ${year}</div>
+    `;
+    statsRow.appendChild(stat);
+  });
+
+  YEARS.forEach(year => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    const mapId = `map-${year}`;
+    card.innerHTML = `
+      <div class="card-header">
+        <span class="card-title">Mobile Penetration</span>
+        <span class="card-year">${year}</span>
+      </div>
+      <div class="card-body">
+        <div class="map-container" id="${mapId}"></div>
+      </div>
+      <div class="legend" id="legend-${year}"></div>
+    `;
+    grid.appendChild(card);
+    document.getElementById(`legend-${year}`).innerHTML = buildLegendSVG(true);
+    requestAnimationFrame(() => {
+      const w = document.getElementById(mapId).parentElement.clientWidth || 560;
+      drawMap(mapId, year, w);
+    });
+  });
+}
+
+function renderSingle(year) {
+  document.getElementById('single-title').textContent = `Mobile Penetration — ${year}`;
+  document.getElementById('single-year-label').textContent = year;
+  document.getElementById('single-legend').innerHTML = buildLegendSVG(false);
+  requestAnimationFrame(() => {
+    const w = document.getElementById('single-map').parentElement.clientWidth || 900;
+    drawMap('single-map', year, w);
+  });
+}
+
+function renderTrend() {
+  // Top gainers
+  const gainers = Object.keys(DATA[2025]).map(iso => {
+    const v05 = DATA[2005][iso] || 0;
+    const v25 = DATA[2025][iso] || 0;
+    return { iso, gain: v25 - v05, v05, v25, name: COUNTRY_NAMES[iso] || iso };
+  }).sort((a,b) => b.gain - a.gain).slice(0, 15);
+
+  const gainerEl = document.getElementById('top-gainers');
+  gainerEl.innerHTML = '<div class="bar-list">' + gainers.map(g => `
+    <div class="bar-row">
+      <div class="bar-label">${g.name}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.min(g.v25/2,100)}%;background:linear-gradient(90deg,#1565c0,#42a5f5)"></div></div>
+      <div class="bar-pct">+${g.gain}pp</div>
+    </div>
+  `).join('') + '</div>';
+
+  // Regional leaders 2025
+  const regions = {
+    'Middle East': ['ARE','SAU','KWT','QAT','OMN','ISR','JOR','LBN','IRN','IRQ','SYR','YEM'],
+    'East Asia': ['HKG','JPN','KOR','CHN','TWN','MNG','PRK'],
+    'SE Asia': ['SGP','MYS','THA','VNM','PHL','IDN','KHM','MMR','LAO'],
+    'Europe': ['LUX','FIN','AUT','ITA','LTU','BGR','DEU','FRA','GBR','NLD','POL','ESP','PRT','CZE'],
+    'Americas': ['URY','ARG','CHL','BRA','CRI','PAN','MEX','USA','CAN','COL','PER'],
+    'Africa': ['GAB','BWA','ZAF','CIV','GHA','NGA','KEN','SEN','ETH','TZA'],
+    'South Asia': ['MDV','LKA','BGD','NPL','PAK','IND','BTN','AFG'],
+  };
+  const regLeaders = Object.entries(regions).map(([region, isos]) => {
+    const vals = isos.map(iso => DATA[2025][iso]).filter(Boolean);
+    const avg = Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
+    return { region, avg };
+  }).sort((a,b) => b.avg - a.avg);
+
+  const regEl = document.getElementById('regional-leaders');
+  const maxVal = regLeaders[0].avg;
+  regEl.innerHTML = '<div class="bar-list">' + regLeaders.map(r => `
+    <div class="bar-row">
+      <div class="bar-label">${r.region}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(r.avg/maxVal*100).toFixed(1)}%;background:linear-gradient(90deg,#4f6ef7,#80deea)"></div></div>
+      <div class="bar-pct">${r.avg}%</div>
+    </div>
+  `).join('') + '</div>';
+
+  // Timeline SVG chart
+  const globalAvgs = YEARS.map(y => {
+    const vals = Object.values(DATA[y]);
+    return { year: y, avg: vals.reduce((a,b)=>a+b,0)/vals.length };
+  });
+
+  const W = 800, H = 200, pad = { top: 20, right: 30, bottom: 30, left: 50 };
+  const xScale = d3.scaleLinear().domain([2005, 2025]).range([pad.left, W - pad.right]);
+  const yScale = d3.scaleLinear().domain([0, 130]).range([H - pad.bottom, pad.top]);
+
+  const chartEl = document.getElementById('timeline-chart');
+  chartEl.innerHTML = '';
+  const svg = d3.select('#timeline-chart').append('svg')
+    .attr('viewBox', `0 0 ${W} ${H}`)
+    .attr('preserveAspectRatio', 'xMidYMid meet')
+    .style('width','100%').style('height','auto');
+
+  // Grid lines
+  [25,50,75,100,125].forEach(v => {
+    svg.append('line')
+      .attr('x1', pad.left).attr('x2', W - pad.right)
+      .attr('y1', yScale(v)).attr('y2', yScale(v))
+      .attr('stroke', '#2e3350').attr('stroke-dasharray', '3,3');
+    svg.append('text')
+      .attr('x', pad.left - 6).attr('y', yScale(v) + 4)
+      .attr('fill', '#8892a4').attr('font-size', 10).attr('text-anchor', 'end')
+      .text(v + '%');
+  });
+
+  // Area
+  const area = d3.area()
+    .x(d => xScale(d.year))
+    .y0(yScale(0))
+    .y1(d => yScale(d.avg))
+    .curve(d3.curveMonotoneX);
+  svg.append('path')
+    .datum(globalAvgs)
+    .attr('d', area)
+    .attr('fill', 'rgba(79,110,247,0.15)');
+
+  // Line
+  const line = d3.line()
+    .x(d => xScale(d.year))
+    .y(d => yScale(d.avg))
+    .curve(d3.curveMonotoneX);
+  svg.append('path')
+    .datum(globalAvgs)
+    .attr('d', line)
+    .attr('fill', 'none')
+    .attr('stroke', '#4f6ef7')
+    .attr('stroke-width', 2.5);
+
+  // Dots + labels
+  globalAvgs.forEach(d => {
+    svg.append('circle')
+      .attr('cx', xScale(d.year)).attr('cy', yScale(d.avg))
+      .attr('r', 5).attr('fill', '#4f6ef7').attr('stroke', '#0f1117').attr('stroke-width', 2);
+    svg.append('text')
+      .attr('x', xScale(d.year)).attr('y', yScale(d.avg) - 10)
+      .attr('fill', '#e2e8f0').attr('font-size', 11).attr('text-anchor', 'middle')
+      .text(d.avg.toFixed(0) + '%');
+    svg.append('text')
+      .attr('x', xScale(d.year)).attr('y', H - pad.bottom + 16)
+      .attr('fill', '#8892a4').attr('font-size', 10).attr('text-anchor', 'middle')
+      .text(d.year);
+  });
+
+  svg.append('text')
+    .attr('x', W/2).attr('y', H - 2)
+    .attr('fill', '#8892a4').attr('font-size', 10).attr('text-anchor', 'middle')
+    .text('Global average mobile subscriptions per 100 people');
+}
+
+function setView(view) {
+  currentView = view;
+  document.querySelectorAll('.tabs:first-of-type .tab').forEach((b,i) => {
+    b.classList.toggle('active', ['quad','single','trend'][i] === view);
+  });
+  document.getElementById('view-quad').style.display = view === 'quad' ? '' : 'none';
+  document.getElementById('view-single').style.display = view === 'single' ? '' : 'none';
+  document.getElementById('view-trend').style.display = view === 'trend' ? '' : 'none';
+
+  if (view === 'quad') renderQuad();
+  if (view === 'single') renderSingle(currentSingleYear);
+  if (view === 'trend') renderTrend();
+}
+
+function setSingleYear(year) {
+  currentSingleYear = year;
+  document.querySelectorAll('#view-single .tab').forEach(b => {
+    b.classList.toggle('active', +b.textContent === year);
+  });
+  renderSingle(year);
+}
+
+loadMap().then(() => {
+  setView('quad');
+});
+</script>
+</body>
+</html>
