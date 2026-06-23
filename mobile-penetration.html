@@ -107,28 +107,10 @@
     .map-container svg { display: block; width: 100%; height: auto; }
 
     .legend {
-      padding: 12px 18px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 11px;
-      color: var(--text-muted);
+      padding: 10px 18px 12px;
       border-top: 1px solid var(--border);
     }
-    .legend-bar {
-      flex: 1;
-      height: 10px;
-      border-radius: 5px;
-      background: linear-gradient(to right, #0e2a47, #1565c0, #42a5f5, #80deea, #a5d6a7, #fff9c4, #ffcc02, #ef6c00, #b71c1c);
-    }
-    .legend-labels {
-      display: flex;
-      justify-content: space-between;
-      width: 100%;
-      font-size: 10px;
-      color: var(--text-muted);
-      margin-top: 3px;
-    }
+    .legend svg { display: block; width: 100%; overflow: visible; }
 
     .tooltip {
       position: fixed;
@@ -240,14 +222,7 @@
       <div class="card-body">
         <div class="map-container" id="single-map"></div>
       </div>
-      <div class="legend">
-        <span>0%</span>
-        <div style="flex:1; display:flex; flex-direction:column;">
-          <div class="legend-bar"></div>
-          <div class="legend-labels"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%+</span></div>
-        </div>
-        <span>100%+</span>
-      </div>
+      <div class="legend" id="single-legend"></div>
     </div>
   </div>
 
@@ -390,31 +365,74 @@ const COUNTRY_NAMES = {
   LSO:"Lesotho",HTI:"Haiti",TTO:"Trinidad & Tobago",GUY:"Guyana",SUR:"Suriname",ISL:"Iceland",
 };
 
-// Color scale: dark blue → light blue → green → yellow → orange → deep red
+// Single source of truth for the color scale.
+// Each entry: [value (subscriptions per 100), [R, G, B]]
+const COLOR_STOPS = [
+  [0,   [22,  36,  71]],   // deep navy   – near-zero penetration
+  [20,  [21,  101, 192]],  // royal blue  – emerging
+  [40,  [30,  136, 229]],  // sky blue    – early majority
+  [60,  [0,   188, 212]],  // cyan        – growing
+  [80,  [0,   150, 136]],  // teal        – widespread
+  [100, [76,  175, 80]],   // green       – ~fully penetrated
+  [115, [255, 235, 59]],   // yellow      – multi-SIM (>1 sub/person)
+  [130, [255, 87,  34]],   // deep orange – very high multi-SIM
+];
+
 function getColor(val) {
   if (val === null || val === undefined) return '#2a2d3e';
-  const v = Math.min(val, 130);
-  // stops: 0→#0d2137, 20→#1565c0, 40→#1e88e5, 60→#42a5f5, 80→#80cbc4, 100→#a5d6a7, 115→#fff176, 130→#ef9a9a
-  const stops = [
-    [0,   [13, 33, 55]],
-    [20,  [21, 101, 192]],
-    [40,  [30, 136, 229]],
-    [60,  [66, 165, 245]],
-    [80,  [128, 203, 196]],
-    [100, [165, 214, 167]],
-    [115, [255, 241, 118]],
-    [130, [239, 154, 154]],
-  ];
-  let i = stops.findIndex(s => s[0] >= v);
-  if (i <= 0) return `rgb(${stops[0][1].join(',')})`;
-  if (i >= stops.length) return `rgb(${stops[stops.length-1][1].join(',')})`;
-  const [v0, c0] = stops[i-1];
-  const [v1, c1] = stops[i];
+  const v = Math.min(val, COLOR_STOPS[COLOR_STOPS.length - 1][0]);
+  let i = COLOR_STOPS.findIndex(s => s[0] >= v);
+  if (i <= 0) return `rgb(${COLOR_STOPS[0][1].join(',')})`;
+  if (i >= COLOR_STOPS.length) return `rgb(${COLOR_STOPS[COLOR_STOPS.length-1][1].join(',')})`;
+  const [v0, c0] = COLOR_STOPS[i-1];
+  const [v1, c1] = COLOR_STOPS[i];
   const t = (v - v0) / (v1 - v0);
   const r = Math.round(c0[0] + t * (c1[0] - c0[0]));
   const g = Math.round(c0[1] + t * (c1[1] - c0[1]));
   const b = Math.round(c0[2] + t * (c1[2] - c0[2]));
   return `rgb(${r},${g},${b})`;
+}
+
+// Builds an SVG legend strip driven by COLOR_STOPS — always in sync with the map.
+function buildLegendSVG(compact = false) {
+  const W = 400, barH = compact ? 10 : 13, topPad = 2, tickH = 5, textY = barH + tickH + 10;
+  const svgH = textY + 12;
+  const maxVal = COLOR_STOPS[COLOR_STOPS.length - 1][0];
+  const gradId = 'cg' + Math.random().toString(36).slice(2);
+
+  const stopMarkup = COLOR_STOPS.map(([v, rgb]) =>
+    `<stop offset="${(v / maxVal * 100).toFixed(1)}%" stop-color="rgb(${rgb.join(',')})"/>`
+  ).join('');
+
+  // Tick positions: every 20 units
+  const ticks = [];
+  for (let v = 0; v <= maxVal; v += 20) ticks.push(v);
+
+  const tickMarkup = ticks.map(v => {
+    const x = (v / maxVal * W).toFixed(1);
+    const label = v === 0 ? '0%' : v >= maxVal ? `${maxVal}%+` : `${v}%`;
+    return `
+      <line x1="${x}" y1="${barH + topPad}" x2="${x}" y2="${barH + topPad + tickH}" stroke="#4a5270" stroke-width="1"/>
+      <text x="${x}" y="${textY}" text-anchor="middle" fill="#8892a4" font-size="${compact ? 9 : 10}" font-family="system-ui,sans-serif">${label}</text>`;
+  }).join('');
+
+  // No-data swatch
+  const swatchX = W + 20;
+  const noDataMarkup = `
+    <rect x="${swatchX}" y="${topPad}" width="${barH + 4}" height="${barH}" rx="2" fill="#2a2d3e" stroke="#4a5270" stroke-width="0.8"/>
+    <text x="${swatchX + barH + 8}" y="${topPad + barH - 2}" fill="#8892a4" font-size="${compact ? 9 : 10}" font-family="system-ui,sans-serif">No data</text>`;
+
+  return `
+    <svg viewBox="0 0 ${W + 90} ${svgH}" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <linearGradient id="${gradId}" x1="0" x2="1" y1="0" y2="0">
+          ${stopMarkup}
+        </linearGradient>
+      </defs>
+      <rect x="0" y="${topPad}" width="${W}" height="${barH}" rx="3" fill="url(#${gradId})"/>
+      ${tickMarkup}
+      ${noDataMarkup}
+    </svg>`;
 }
 
 let worldData = null;
@@ -531,15 +549,10 @@ function renderQuad() {
       <div class="card-body">
         <div class="map-container" id="${mapId}"></div>
       </div>
-      <div class="legend">
-        <div style="flex:1; display:flex; flex-direction:column;">
-          <div class="legend-bar"></div>
-          <div class="legend-labels"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%+</span></div>
-        </div>
-      </div>
+      <div class="legend" id="legend-${year}"></div>
     `;
     grid.appendChild(card);
-    // Draw after DOM is ready
+    document.getElementById(`legend-${year}`).innerHTML = buildLegendSVG(true);
     requestAnimationFrame(() => {
       const w = document.getElementById(mapId).parentElement.clientWidth || 560;
       drawMap(mapId, year, w);
@@ -550,6 +563,7 @@ function renderQuad() {
 function renderSingle(year) {
   document.getElementById('single-title').textContent = `Mobile Penetration — ${year}`;
   document.getElementById('single-year-label').textContent = year;
+  document.getElementById('single-legend').innerHTML = buildLegendSVG(false);
   requestAnimationFrame(() => {
     const w = document.getElementById('single-map').parentElement.clientWidth || 900;
     drawMap('single-map', year, w);
