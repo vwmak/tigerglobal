@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bank Charter Pipeline &amp; Recent Grants Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --border: #2e3350;
+      --text: #e2e8f0;
+      --text-muted: #8892a4;
+      --accent: #4f6ef7;
+      /* charter-type palette */
+      --trust: #4f9ef7;     /* OCC National Trust Bank */
+      --national: #34d399;  /* Full-service national bank (de novo) */
+      --acquired: #a78bfa;  /* National bank via acquisition/conversion */
+      --ilc: #f59e0b;       /* Industrial Loan Company (ILC) */
+      /* status colors */
+      --st-pending: #8892a4;
+      --st-cond: #facc15;
+      --st-final: #34d399;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+    header p { color: var(--text-muted); margin-top: 4px; font-size: 13px; max-width: 720px; }
+    .clock-box { text-align: right; font-size: 12px; color: var(--text-muted); line-height: 1.7; }
+    .clock-box .live { color: var(--st-final); font-weight: 600; }
+    .clock-box .live .pulse {
+      display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+      background: var(--st-final); margin-right: 5px;
+      animation: pulse 1.6s infinite ease-in-out;
+    }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
+
+    /* ── Layout ── */
+    main { padding: 28px 32px; max-width: 1400px; margin: 0 auto; }
+
+    /* ── KPI row ── */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+      border-top: 3px solid var(--accent);
+    }
+    .kpi-card .label { font-size: 11px; text-transform: uppercase; letter-spacing: .8px; color: var(--text-muted); }
+    .kpi-card .value { font-size: 30px; font-weight: 700; margin-top: 6px; }
+    .kpi-card .sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+    /* ── Controls ── */
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .controls label { font-size: 12px; color: var(--text-muted); margin-right: 4px; }
+    select, button, input {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      padding: 7px 14px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    input { cursor: text; min-width: 200px; }
+    select:focus, button:focus, input:focus { outline: none; border-color: var(--accent); }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      transition: opacity .2s;
+      border: 1px solid var(--border);
+    }
+    .chip.inactive { opacity: .32; }
+
+    /* ── Chart cards ── */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 1000px) { .chart-grid { grid-template-columns: 1fr; } }
+    .chart-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .chart-card h2 { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
+    .chart-card canvas { max-height: 300px; }
+
+    /* ── Group tables ── */
+    .group {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .group-head {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .group-head .bar { width: 4px; height: 22px; border-radius: 3px; }
+    .group-head h2 { font-size: 15px; font-weight: 700; }
+    .group-head .count { color: var(--text-muted); font-size: 12px; }
+    .group-head .desc { color: var(--text-muted); font-size: 12px; flex-basis: 100%; margin-left: 16px; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th {
+      background: var(--surface2);
+      padding: 10px 16px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--surface2); }
+    tbody td { padding: 11px 16px; vertical-align: top; }
+    tbody td.company { font-weight: 600; white-space: nowrap; }
+    tbody td .ticker { color: var(--text-muted); font-weight: 400; font-size: 11px; margin-left: 5px; }
+    tbody td .bankname { color: var(--text-muted); font-size: 12px; margin-top: 2px; font-weight: 400; }
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .badge.pending { background: rgba(136,146,164,.18); color: #b6c0d0; border: 1px solid rgba(136,146,164,.4); }
+    .badge.cond    { background: rgba(250,204,21,.14);  color: #facc15; border: 1px solid rgba(250,204,21,.4); }
+    .badge.final   { background: rgba(52,211,153,.14);  color: #34d399; border: 1px solid rgba(52,211,153,.45); }
+    .muted { color: var(--text-muted); }
+    .empty { padding: 24px 20px; color: var(--text-muted); font-size: 13px; }
+
+    /* ── Footer ── */
+    .disclaimer {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-top: 8px;
+    }
+    .disclaimer strong { color: var(--text); }
+    .disclaimer a { color: var(--accent); text-decoration: none; }
+    .disclaimer a:hover { text-decoration: underline; }
+    .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; }
+    .section-title { font-size: 13px; text-transform: uppercase; letter-spacing: .8px; color: var(--text-muted); margin: 4px 0 14px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>US Bank Charter Pipeline &amp; Recent Grants</h1>
+    <p>Companies pursuing &mdash; or newly granted &mdash; a US bank charter, grouped by charter type. Tracks the current fintech, crypto &amp; digital-asset charter wave plus notable non-bank applicants. Coverage window for grants: trailing ~2 years.</p>
+  </div>
+  <div class="clock-box">
+    <div class="live"><span class="pulse"></span><span id="liveClock"></span> ET</div>
+    <div>Data as of <strong id="dataAsOf" style="color:var(--text)"></strong></div>
+    <div id="refreshNote"></div>
+  </div>
+</header>
+
+<main>
+
+  <div class="kpi-row" id="kpiRow"></div>
+
+  <div class="controls">
+    <div>
+      <label>Charter type:</label>
+      <select id="typeSelect"><option value="all">All types</option></select>
+    </div>
+    <div>
+      <label>Status:</label>
+      <select id="statusSelect">
+        <option value="all">All statuses</option>
+        <option value="Pending">Pipeline (pending)</option>
+        <option value="Conditionally Approved">Conditionally approved</option>
+        <option value="Final Approval">Chartered / operating</option>
+      </select>
+    </div>
+    <div>
+      <input id="searchInput" type="text" placeholder="Search company or bank name&hellip;" />
+    </div>
+    <div class="chips" id="statusChips"></div>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-card">
+      <h2>Companies by Charter Type &amp; Status</h2>
+      <canvas id="stackChart"></canvas>
+    </div>
+    <div class="chart-card">
+      <h2>Pipeline vs. Chartered</h2>
+      <canvas id="statusChart"></canvas>
+    </div>
+    <div class="chart-card">
+      <h2>Cumulative Charter Actions Over Time</h2>
+      <canvas id="timelineChart"></canvas>
+    </div>
+  </div>
+
+  <div class="section-title">Detail &mdash; grouped by charter type</div>
+  <div id="groups"></div>
+
+  <div class="disclaimer" id="disclaimer"></div>
+
+</main>
+
+<script>
+// ══════════════════════════════════════════════════════════════════════
+//  BANK CHARTER TRACKER — DATA
+//  Machine-updatable block. A scheduled refresh job re-runs the research
+//  and rewrites LAST_UPDATED + CHARTERS below, then commits the change.
+//  Sources: OCC news releases & corporate decisions, FDIC, company press
+//  releases, and trade press (Banking Dive, American Banker, Payments Dive,
+//  Forbes, law-firm client alerts). See disclaimer for links.
+// ══════════════════════════════════════════════════════════════════════
+
+const LAST_UPDATED = '2026-07-12';   // YYYY-MM-DD — bumped by refresh job
+const AUTO_REFRESH_MINUTES = 15;     // page reloads to pick up new commits
+
+// Charter-type taxonomy (order + metadata drives grouping & colors)
+const CHARTER_TYPES = [
+  { id: 'trust',    label: 'OCC National Trust Bank',            color: '#4f9ef7',
+    desc: 'Non-depository national trust charter. The dominant path for crypto / stablecoin / digital-asset firms, especially post-GENIUS Act (enacted Jul 18, 2025). Enables fiduciary custody and, for approved issuers, payment-stablecoin activity — but no FDIC-insured deposits or lending.' },
+  { id: 'national', label: 'Full-Service National Bank (de novo)', color: '#34d399',
+    desc: 'A brand-new, FDIC-insured full-service national bank chartered by the OCC. Takes deposits and lends. The hardest and rarest path.' },
+  { id: 'acquired', label: 'National Bank via Acquisition / Conversion', color: '#a78bfa',
+    desc: 'A fintech obtains a charter by buying an existing chartered bank (or converting), inheriting its national bank charter rather than starting de novo.' },
+  { id: 'ilc',      label: 'Industrial Loan Company (ILC)',        color: '#f59e0b',
+    desc: 'FDIC-insured, Utah-chartered industrial bank. Supervised by the FDIC + state (not the Federal Reserve), letting a commercial parent own a bank. Favored by auto lenders, payments and BNPL firms.' },
+];
+
+// status: 'Pending' | 'Conditionally Approved' | 'Final Approval'
+// date = most relevant decision/filing date (YYYY-MM or YYYY-MM-DD)
+const CHARTERS = [
+  // ── OCC National Trust Bank ──────────────────────────────────────────
+  { company: 'Circle', ticker: 'CRCL', bank: 'First National Digital Currency Bank, N.A. (Circle National Trust)', type: 'trust', status: 'Final Approval', regulator: 'OCC', filed: '2025-06-30', date: '2026-07-10', sector: 'Stablecoin (USDC)', note: 'First stablecoin issuer to win final OCC trust-bank approval. Authorized to open on/after Jul 10, 2026; will custody USDC reserves & digital assets.' },
+  { company: 'Ripple', ticker: '', bank: 'Ripple National Trust Bank', type: 'trust', status: 'Conditionally Approved', regulator: 'OCC', filed: '2025-07-02', date: '2025-12-12', sector: 'Crypto / stablecoin (RLUSD)', note: 'De novo applicant; part of the Dec 12, 2025 batch of five. Meeting pre-opening conditions.' },
+  { company: 'Paxos', ticker: '', bank: 'Paxos Trust Company, N.A.', type: 'trust', status: 'Conditionally Approved', regulator: 'OCC', filed: '2025-08', date: '2025-12-12', sector: 'Stablecoin infra (USDG, issuer of PYUSD)', note: 'Conversion from NY state trust company to national trust bank.' },
+  { company: 'BitGo', ticker: '', bank: 'BitGo Bank & Trust, N.A.', type: 'trust', status: 'Conditionally Approved', regulator: 'OCC', filed: '2025', date: '2025-12-12', sector: 'Digital-asset custody', note: 'State-trust-to-national-trust conversion.' },
+  { company: 'Fidelity Digital Assets', ticker: '', bank: 'Fidelity Digital Assets, N.A.', type: 'trust', status: 'Conditionally Approved', regulator: 'OCC', filed: '2025', date: '2025-12-12', sector: 'Digital-asset custody', note: 'Fidelity Investments’ digital-asset arm; state-trust conversion.' },
+  { company: 'Protego', ticker: '', bank: 'Protego Trust Bank, N.A.', type: 'trust', status: 'Conditionally Approved', regulator: 'OCC', filed: '2025', date: '2026-02', sector: 'Digital-asset custody', note: 'Seattle-based; conditionally approved early Feb 2026.' },
+  { company: 'Bridge (Stripe)', ticker: '', bank: 'Bridge national trust bank', type: 'trust', status: 'Conditionally Approved', regulator: 'OCC', filed: '2025-10', date: '2026-02-12', sector: 'Stablecoin infrastructure', note: 'Stripe’s stablecoin subsidiary (acquired 2024). Would issue stablecoins, custody assets & manage reserves under OCC oversight.' },
+  { company: 'Crypto.com', ticker: '', bank: 'Foris DAX national trust bank', type: 'trust', status: 'Conditionally Approved', regulator: 'OCC', filed: '2025', date: '2026-02-23', sector: 'Crypto exchange', note: 'Parent Foris DAX received the conditional nod.' },
+  { company: 'Coinbase', ticker: 'COIN', bank: 'Coinbase National Trust Company', type: 'trust', status: 'Conditionally Approved', regulator: 'OCC', filed: '2025-10', date: '2026-04-02', sector: 'Crypto exchange / custody', note: 'Custody, safekeeping & fiduciary digital-asset services under a single federal regulator.' },
+  { company: 'Morgan Stanley', ticker: 'MS', bank: 'Morgan Stanley Digital Trust, N.A.', type: 'trust', status: 'Pending', regulator: 'OCC', filed: '2026-02-18', date: '2026-02-18', sector: 'Bank / wealth mgmt (digital assets)', note: 'Wall Street incumbent quietly filed for a digital-asset trust charter.' },
+  { company: 'Payoneer', ticker: 'PAYO', bank: 'Payoneer national trust bank', type: 'trust', status: 'Pending', regulator: 'OCC', filed: '2026-02-24', date: '2026-02-24', sector: 'Cross-border payments', note: 'Application filed Feb 24, 2026.' },
+  { company: 'Zerohash', ticker: '', bank: 'Zerohash national trust bank', type: 'trust', status: 'Pending', regulator: 'OCC', filed: '2026-03-05', date: '2026-03-05', sector: 'Crypto / stablecoin infrastructure', note: 'Chicago-based B2B crypto infrastructure provider.' },
+  { company: 'World Liberty Financial', ticker: '', bank: 'WLF national trust bank', type: 'trust', status: 'Pending', regulator: 'OCC', filed: '2026', date: '2026', sector: 'Stablecoin (USD1)', note: 'Trump-family-backed venture behind the USD1 stablecoin.' },
+  { company: 'Kraken (Payward)', ticker: '', bank: 'Payward national trust bank', type: 'trust', status: 'Pending', regulator: 'OCC', filed: '2026', date: '2026', sector: 'Crypto exchange', note: 'Among the growing 2026 applicant list.' },
+  { company: 'Charles Schwab', ticker: 'SCHW', bank: 'Schwab digital-asset trust', type: 'trust', status: 'Pending', regulator: 'OCC', filed: '2026', date: '2026', sector: 'Brokerage / wealth mgmt', note: 'Reported to be pursuing a trust charter for digital-asset services.' },
+  { company: 'Laser Digital', ticker: '', bank: 'Laser Digital national trust bank', type: 'trust', status: 'Pending', regulator: 'OCC', filed: '2026', date: '2026', sector: 'Digital assets (Nomura-backed)', note: 'Nomura-backed digital-asset firm.' },
+  { company: 'EDX Markets', ticker: '', bank: 'EDX national trust bank', type: 'trust', status: 'Pending', regulator: 'OCC', filed: '2026', date: '2026', sector: 'Crypto exchange (Citadel-backed)', note: 'Citadel Securities / Fidelity / Schwab-backed exchange.' },
+  { company: 'Catena Labs', ticker: '', bank: 'Catena Labs national trust bank', type: 'trust', status: 'Pending', regulator: 'OCC', filed: '2026', date: '2026', sector: 'AI-native financial infrastructure', note: 'Among the 2026 applicant cohort.' },
+
+  // ── Full-Service National Bank (de novo) ─────────────────────────────
+  { company: 'Erebor Bank', ticker: '', bank: 'Erebor Bank, N.A. (Columbus, OH)', type: 'national', status: 'Final Approval', regulator: 'OCC', filed: '2025-06-11', date: '2026-02', sector: 'Tech / digital-asset banking', note: 'First new national bank chartered under the current administration. Conditional Oct 15, 2025; FDIC insurance Dec 2025; opened ~$635M capital. Backed by Palmer Luckey, Joe Lonsdale (8VC) & Founders Fund; serves tech firms and crypto users.' },
+
+  // ── National Bank via Acquisition / Conversion ───────────────────────
+  { company: 'SmartBiz', ticker: '', bank: 'SmartBiz Bank, N.A. (fmr. CenTrust Bank)', type: 'acquired', status: 'Final Approval', regulator: 'OCC', filed: '2024', date: '2025-03-17', sector: 'SMB / SBA lending', note: 'Acquired Detroit-based CenTrust Bank (~$130M deal); OCC conditionally approved the fintech business model Mar 17, 2025 and it was renamed SmartBiz Bank.' },
+
+  // ── Industrial Loan Company (ILC) — FDIC / Utah ──────────────────────
+  { company: 'Thrivent', ticker: '', bank: 'Thrivent Bank (Salt Lake City, UT)', type: 'ilc', status: 'Final Approval', regulator: 'FDIC + Utah DFI', filed: '2023', date: '2024-06', sector: 'Faith-based financial services', note: 'FDIC’s first ILC deposit-insurance approval since 2020; bank subsequently opened.' },
+  { company: 'Ford', ticker: 'F', bank: 'Ford Credit Bank (Salt Lake City, UT)', type: 'ilc', status: 'Conditionally Approved', regulator: 'FDIC + Utah DFI', filed: '2025', date: '2026-01-23', sector: 'Auto finance', note: 'FDIC conditional deposit-insurance approval published Jan 23, 2026.' },
+  { company: 'General Motors', ticker: 'GM', bank: 'GM Financial Bank (Salt Lake City, UT)', type: 'ilc', status: 'Conditionally Approved', regulator: 'FDIC + Utah DFI', filed: '2025-02', date: '2026-01-23', sector: 'Auto finance', note: 'Reapplied Feb 2025 after withdrawing an earlier bid; conditional approval alongside Ford.' },
+  { company: 'Edward Jones', ticker: '', bank: 'Edward Jones Bank (Utah)', type: 'ilc', status: 'Conditionally Approved', regulator: 'FDIC + Utah DFI', filed: '2025', date: '2026-02-27', sector: 'Wealth management', note: 'FDIC + Utah DFI conditional approval Feb 27, 2026.' },
+  { company: 'Stellantis', ticker: 'STLA', bank: 'Stellantis Bank (Utah)', type: 'ilc', status: 'Conditionally Approved', regulator: 'FDIC + Utah DFI', filed: '2025', date: '2026', sector: 'Auto finance', note: 'Conditional ILC approval in the 2026 wave of auto-lender industrial banks.' },
+  { company: 'Affirm', ticker: 'AFRM', bank: 'Affirm ILC (proposed)', type: 'ilc', status: 'Pending', regulator: 'FDIC + Utah DFI', filed: '2025', date: '2025', sector: 'BNPL / consumer credit', note: 'ILC application awaiting FDIC decision.' },
+  { company: 'PayPal', ticker: 'PYPL', bank: 'PayPal ILC (proposed)', type: 'ilc', status: 'Pending', regulator: 'FDIC + Utah DFI', filed: '2025', date: '2025', sector: 'Payments', note: 'ILC application awaiting FDIC decision.' },
+  { company: 'Nissan', ticker: '', bank: 'Nissan ILC (proposed)', type: 'ilc', status: 'Pending', regulator: 'FDIC + Utah DFI', filed: '2024', date: '2024', sector: 'Auto finance', note: 'ILC application pending before the FDIC.' },
+];
+
+// ══════════════════════════════════════════════════════════════════════
+//  RENDERING
+// ══════════════════════════════════════════════════════════════════════
+const typeMeta = Object.fromEntries(CHARTER_TYPES.map(t => [t.id, t]));
+const STATUSES = [
+  { id: 'Pending',                label: 'Pipeline (pending)',   cls: 'pending', color: '#8892a4' },
+  { id: 'Conditionally Approved', label: 'Conditionally approved', cls: 'cond',   color: '#facc15' },
+  { id: 'Final Approval',         label: 'Chartered / operating', cls: 'final',   color: '#34d399' },
+];
+const statusMeta = Object.fromEntries(STATUSES.map(s => [s.id, s]));
+
+// State
+let filterType = 'all';
+let filterStatus = 'all';
+let searchQuery = '';
+let activeStatuses = new Set(STATUSES.map(s => s.id));
+let stackChart, statusChart, timelineChart;
+
+function filtered() {
+  return CHARTERS.filter(c => {
+    if (filterType !== 'all' && c.type !== filterType) return false;
+    if (filterStatus !== 'all' && c.status !== filterStatus) return false;
+    if (!activeStatuses.has(c.status)) return false;
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      if (!(c.company.toLowerCase().includes(q) || (c.bank || '').toLowerCase().includes(q) ||
+            (c.sector || '').toLowerCase().includes(q))) return false;
+    }
+    return true;
+  });
+}
+
+// ── KPIs ──
+function buildKPIs() {
+  const row = document.getElementById('kpiRow');
+  const data = filtered();
+  const pending = data.filter(c => c.status === 'Pending').length;
+  const cond = data.filter(c => c.status === 'Conditionally Approved').length;
+  const final = data.filter(c => c.status === 'Final Approval').length;
+  const types = new Set(data.map(c => c.type)).size;
+
+  const cards = [
+    { label: 'Companies tracked', value: data.length, sub: 'matching current filters', color: 'var(--accent)' },
+    { label: 'In pipeline', value: pending, sub: 'application pending', color: 'var(--st-pending)' },
+    { label: 'Conditionally approved', value: cond, sub: 'awaiting final / opening', color: 'var(--st-cond)' },
+    { label: 'Chartered / operating', value: final, sub: 'received charter', color: 'var(--st-final)' },
+    { label: 'Charter types', value: types, sub: 'distinct pathways', color: 'var(--trust)' },
+  ];
+  row.innerHTML = cards.map(c => `
+    <div class="kpi-card" style="border-top-color:${c.color}">
+      <div class="label">${c.label}</div>
+      <div class="value">${c.value}</div>
+      <div class="sub">${c.sub}</div>
+    </div>`).join('');
+}
+
+// ── Status filter chips ──
+function buildChips() {
+  const el = document.getElementById('statusChips');
+  el.innerHTML = '';
+  STATUSES.forEach(s => {
+    const on = activeStatuses.has(s.id);
+    const btn = document.createElement('button');
+    btn.className = 'chip' + (on ? '' : ' inactive');
+    btn.style.borderColor = s.color;
+    btn.style.color = s.color;
+    btn.style.background = on ? s.color + '22' : 'transparent';
+    btn.innerHTML = `<span class="dot" style="background:${s.color}"></span>${s.label}`;
+    btn.onclick = () => { on ? activeStatuses.delete(s.id) : activeStatuses.add(s.id); render(); };
+    el.appendChild(btn);
+  });
+}
+
+// ── Stacked bar: type × status ──
+function buildStackChart() {
+  if (typeof Chart === 'undefined') return;
+  const data = filtered();
+  const labels = CHARTER_TYPES.map(t => t.label);
+  const datasets = STATUSES.map(s => ({
+    label: s.label,
+    backgroundColor: s.color + (s.id === 'Pending' ? '77' : 'cc'),
+    borderColor: s.color,
+    borderWidth: 1,
+    data: CHARTER_TYPES.map(t => data.filter(c => c.type === t.id && c.status === s.id).length),
+  }));
+  if (stackChart) stackChart.destroy();
+  stackChart = new Chart(document.getElementById('stackChart'), {
+    type: 'bar',
+    data: { labels: CHARTER_TYPES.map(t => t.label.replace(/ \(.*\)/, '')), datasets },
+    options: {
+      responsive: true,
+      indexAxis: 'y',
+      plugins: { legend: { labels: { color: '#8892a4', font: { size: 11 } } } },
+      scales: {
+        x: { stacked: true, ticks: { color: '#8892a4', precision: 0 }, grid: { color: '#2e3350' } },
+        y: { stacked: true, ticks: { color: '#8892a4', font: { size: 11 } }, grid: { display: false } },
+      },
+    },
+  });
+}
+
+// ── Doughnut: pipeline vs chartered ──
+function buildStatusChart() {
+  if (typeof Chart === 'undefined') return;
+  const data = filtered();
+  const counts = STATUSES.map(s => data.filter(c => c.status === s.id).length);
+  if (statusChart) statusChart.destroy();
+  statusChart = new Chart(document.getElementById('statusChart'), {
+    type: 'doughnut',
+    data: { labels: STATUSES.map(s => s.label), datasets: [{ data: counts, backgroundColor: STATUSES.map(s => s.color + 'cc'), borderColor: '#1a1d27', borderWidth: 2 }] },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#8892a4', font: { size: 11 }, padding: 12 } },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed}` } },
+      },
+    },
+  });
+}
+
+// ── Timeline: cumulative decisions over time ──
+function buildTimelineChart() {
+  if (typeof Chart === 'undefined') return;
+  // Use decisions that have landed (conditional or final), by month
+  const events = filtered()
+    .filter(c => c.status !== 'Pending' && /^\d{4}-\d{2}/.test(c.date))
+    .map(c => ({ ym: c.date.slice(0, 7), type: c.type }))
+    .sort((a, b) => a.ym.localeCompare(b.ym));
+  const months = [...new Set(events.map(e => e.ym))];
+  const datasets = CHARTER_TYPES.map(t => {
+    let cum = 0;
+    return {
+      label: t.label.replace(/ \(.*\)/, ''),
+      borderColor: t.color,
+      backgroundColor: t.color + '33',
+      tension: 0.3,
+      pointRadius: 3,
+      fill: false,
+      data: months.map(m => { cum += events.filter(e => e.ym === m && e.type === t.id).length; return cum; }),
+    };
+  });
+  if (timelineChart) timelineChart.destroy();
+  timelineChart = new Chart(document.getElementById('timelineChart'), {
+    type: 'line',
+    data: { labels: months, datasets },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { labels: { color: '#8892a4', font: { size: 10 }, boxWidth: 12 } } },
+      scales: {
+        x: { ticks: { color: '#8892a4', font: { size: 10 } }, grid: { color: '#2e3350' } },
+        y: { ticks: { color: '#8892a4', precision: 0 }, grid: { color: '#2e3350' }, title: { display: true, text: 'Cumulative approvals', color: '#8892a4', font: { size: 10 } } },
+      },
+    },
+  });
+}
+
+// ── Grouped detail tables ──
+function fmtDate(d) {
+  if (!d) return '<span class="muted">&mdash;</span>';
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const parts = d.split('-');
+  if (parts.length === 1) return parts[0];
+  if (parts.length === 2) return `${months[+parts[1]-1]} ${parts[0]}`;
+  return `${months[+parts[1]-1]} ${+parts[2]}, ${parts[0]}`;
+}
+
+function buildGroups() {
+  const container = document.getElementById('groups');
+  const data = filtered();
+  container.innerHTML = '';
+
+  const order = { 'Final Approval': 0, 'Conditionally Approved': 1, 'Pending': 2 };
+
+  CHARTER_TYPES.forEach(t => {
+    if (filterType !== 'all' && filterType !== t.id) return;
+    const rows = data.filter(c => c.type === t.id)
+      .sort((a, b) => (order[a.status] - order[b.status]) || (b.date || '').localeCompare(a.date || ''));
+    if (!rows.length) return;
+
+    const finalCount = rows.filter(r => r.status === 'Final Approval').length;
+    const condCount = rows.filter(r => r.status === 'Conditionally Approved').length;
+    const pendCount = rows.filter(r => r.status === 'Pending').length;
+
+    const group = document.createElement('div');
+    group.className = 'group';
+    group.innerHTML = `
+      <div class="group-head">
+        <div class="bar" style="background:${t.color}"></div>
+        <h2>${t.label}</h2>
+        <span class="count">${rows.length} ${rows.length === 1 ? 'company' : 'companies'}
+          &nbsp;&middot;&nbsp; ${finalCount} chartered &middot; ${condCount} conditional &middot; ${pendCount} pending</span>
+        <div class="desc">${t.desc}</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Company</th><th>Status</th><th>Regulator</th><th>Key date</th><th>Sector</th><th>Notes</th>
+          </tr></thead>
+          <tbody>
+            ${rows.map(r => {
+              const sm = statusMeta[r.status];
+              return `<tr>
+                <td class="company">${r.company}${r.ticker ? `<span class="ticker">${r.ticker}</span>` : ''}
+                  <div class="bankname">${r.bank}</div></td>
+                <td><span class="badge ${sm.cls}">${sm.label}</span></td>
+                <td class="muted">${r.regulator}</td>
+                <td>${fmtDate(r.date)}</td>
+                <td class="muted">${r.sector}</td>
+                <td class="muted">${r.note}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>`;
+    container.appendChild(group);
+  });
+
+  if (!container.children.length) {
+    container.innerHTML = '<div class="group"><div class="empty">No companies match the current filters.</div></div>';
+  }
+}
+
+// ── Disclaimer ──
+function buildDisclaimer() {
+  document.getElementById('disclaimer').innerHTML = `
+    <strong>About this dashboard.</strong> Tracks companies pursuing or newly granted a US bank charter, grouped by charter type.
+    &ldquo;Pipeline&rdquo; = application filed but not yet finally approved; &ldquo;chartered / operating&rdquo; = final approval received (grants shown for the trailing ~2 years).
+    Note that an <strong>OCC national <em>trust</em> bank</strong> is not the same as a full-service depository bank &mdash; it generally cannot take FDIC-insured deposits or make loans, and is used for fiduciary custody and (post-GENIUS Act) payment-stablecoin activity.
+    <br><br>
+    <strong>Context.</strong> Charter activity accelerated sharply in 2025&ndash;2026 under Comptroller Jonathan Gould and after the <strong>GENIUS Act</strong> (payment-stablecoin framework, enacted Jul 18, 2025). The OCC reports an all-time-high wave of de novo, conversion and trust applications, the majority from technology-oriented firms.
+    <br><br>
+    <strong>Sources.</strong> OCC news releases &amp; corporate decisions
+    (<a href="https://www.occ.gov/news-issuances/news-releases/2025/nr-occ-2025-125.html" target="_blank" rel="noopener">nr-2025-125</a>,
+    <a href="https://www.occ.gov/news-issuances/news-releases/2025/nr-occ-2025-101.html" target="_blank" rel="noopener">nr-2025-101 (Erebor)</a>),
+    FDIC deposit-insurance orders, company press releases
+    (<a href="https://www.circle.com/pressroom/circle-receives-final-occ-approval-to-establish-national-trust-bank" target="_blank" rel="noopener">Circle</a>),
+    and trade press &mdash; Banking Dive, American Banker, Payments Dive, Forbes, plus law-firm client alerts (Steptoe, Sidley, Paul Hastings, Goodwin).
+    <br><br>
+    <strong>Disclaimer.</strong> For informational purposes only; not investment, legal or regulatory advice. Statuses and dates change frequently &mdash; verify against primary OCC/FDIC filings before relying on any figure. Some filing dates are approximate where only month-level detail is public.
+    &mdash; Data as of ${fmtDate(LAST_UPDATED)}.`;
+}
+
+// ── Full render ──
+function render() {
+  // Data views first so they always render, even if the chart CDN is blocked.
+  buildKPIs();
+  buildChips();
+  buildGroups();
+  if (typeof Chart === 'undefined') {
+    document.querySelectorAll('.chart-card canvas').forEach(cv => {
+      if (cv.dataset.noted) return;
+      cv.dataset.noted = '1';
+      const n = document.createElement('div');
+      n.className = 'empty';
+      n.textContent = 'Charts require an internet connection (Chart.js). Data tables below are fully available offline.';
+      cv.replaceWith(n);
+    });
+  } else {
+    buildStackChart();
+    buildStatusChart();
+    buildTimelineChart();
+  }
+}
+
+// ── Init controls ──
+(function initControls() {
+  const typeSel = document.getElementById('typeSelect');
+  CHARTER_TYPES.forEach(t => {
+    const o = document.createElement('option');
+    o.value = t.id; o.textContent = t.label;
+    typeSel.appendChild(o);
+  });
+  typeSel.addEventListener('change', e => { filterType = e.target.value; render(); });
+  document.getElementById('statusSelect').addEventListener('change', e => { filterStatus = e.target.value; render(); });
+  document.getElementById('searchInput').addEventListener('input', e => { searchQuery = e.target.value; render(); });
+})();
+
+// ── Live clock + data-as-of + auto refresh ──
+function tickClock() {
+  const now = new Date();
+  const opts = { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+  document.getElementById('liveClock').textContent = new Intl.DateTimeFormat('en-US', opts).format(now);
+}
+setInterval(tickClock, 1000); tickClock();
+
+document.getElementById('dataAsOf').textContent = fmtDate(LAST_UPDATED);
+document.getElementById('refreshNote').textContent = `Auto-refreshes every ${AUTO_REFRESH_MINUTES} min`;
+setTimeout(() => location.reload(), AUTO_REFRESH_MINUTES * 60 * 1000);
+
+buildDisclaimer();
+render();
+</script>
+</body>
+</html>
