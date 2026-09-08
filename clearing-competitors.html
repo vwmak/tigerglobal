@@ -1,0 +1,1230 @@
+<title>Augustus Clearing Rivals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    color-scheme: light;
+
+    /* neutrals, biased slightly warm toward the copper accent */
+    --page:        #f2f0ec;
+    --surface:     #fcfbf9;
+    --surface-2:   #f7f5f1;
+    --ink:         #17140f;
+    --ink-2:       #56514a;
+    --muted:       #8a8479;
+    --grid:        #e3e0d8;
+    --baseline:    #c6c1b5;
+    --border:      rgba(23,20,15,0.11);
+    --border-firm: rgba(23,20,15,0.20);
+
+    /* copper accent — UI only, never a chart series */
+    --accent:      #9a5b23;
+    --accent-ink:  #7d4818;
+    --accent-wash: rgba(154,91,35,0.10);
+
+    /* overlap: single-hue ordinal ramp, validated light→dark */
+    --ov-low:      #86b6ef;
+    --ov-mid:      #2a78d6;
+    --ov-high:     #104281;
+    --ov-low-wash: rgba(134,182,239,0.20);
+    --ov-mid-wash: rgba(42,120,214,0.14);
+    --ov-high-ink: #ffffff;
+    --ov-mid-ink:  #1c5cab;
+
+    --focus:       #9a5b23;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --page:        #100f0d;
+      --surface:     #1a1918;
+      --surface-2:   #211f1d;
+      --ink:         #fbfaf7;
+      --ink-2:       #c4bfb4;
+      --muted:       #8d877c;
+      --grid:        #2c2a27;
+      --baseline:    #3a3733;
+      --border:      rgba(251,250,247,0.11);
+      --border-firm: rgba(251,250,247,0.22);
+      --accent:      #d9954f;
+      --accent-ink:  #e8ab6c;
+      --accent-wash: rgba(217,149,79,0.13);
+      --ov-low:      #1c5cab;
+      --ov-mid:      #3987e5;
+      --ov-high:     #9ec5f4;
+      --ov-low-wash: rgba(28,92,171,0.28);
+      --ov-mid-wash: rgba(57,135,229,0.18);
+      --ov-high-ink: #0d2340;
+      --ov-mid-ink:  #9ec5f4;
+      --focus:       #d9954f;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page:        #100f0d;
+    --surface:     #1a1918;
+    --surface-2:   #211f1d;
+    --ink:         #fbfaf7;
+    --ink-2:       #c4bfb4;
+    --muted:       #8d877c;
+    --grid:        #2c2a27;
+    --baseline:    #3a3733;
+    --border:      rgba(251,250,247,0.11);
+    --border-firm: rgba(251,250,247,0.22);
+    --accent:      #d9954f;
+    --accent-ink:  #e8ab6c;
+    --accent-wash: rgba(217,149,79,0.13);
+    --ov-low:      #1c5cab;
+    --ov-mid:      #3987e5;
+    --ov-high:     #9ec5f4;
+    --ov-low-wash: rgba(28,92,171,0.28);
+    --ov-mid-wash: rgba(57,135,229,0.18);
+    --ov-high-ink: #0d2340;
+    --ov-mid-ink:  #9ec5f4;
+    --focus:       #d9954f;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--page);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .shell {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 28px 22px 72px;
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+  }
+
+  /* ---------- type ---------- */
+  h1, h2, h3 {
+    font-family: Archivo, "IBM Plex Sans", system-ui, sans-serif;
+    margin: 0;
+    text-wrap: balance;
+    letter-spacing: -0.018em;
+  }
+  h1 { font-size: clamp(30px, 4.6vw, 46px); font-weight: 800; line-height: 1.04; }
+  h2 { font-size: 19px; font-weight: 700; letter-spacing: -0.01em; }
+  h3 { font-size: 15px; font-weight: 700; }
+  p  { margin: 0; }
+
+  .eyebrow {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+  .lede { font-size: 17px; color: var(--ink-2); max-width: 66ch; }
+  .note { font-size: 13px; color: var(--ink-2); }
+  .tiny { font-size: 12px; color: var(--muted); }
+
+  /* ---------- header ---------- */
+  header.masthead {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-bottom: 22px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .masthead-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px 20px;
+  }
+  .subject-tag {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    background: var(--accent-wash);
+    border: 1px solid var(--accent);
+    border-radius: 2px;
+    padding: 4px 8px;
+    white-space: nowrap;
+  }
+
+  /* ---------- stat strip ---------- */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 1px;
+    background: var(--border-firm);
+    border: 1px solid var(--border-firm);
+  }
+  .stat {
+    background: var(--surface);
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .stat-val {
+    font-family: Archivo, sans-serif;
+    font-weight: 800;
+    font-size: 30px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+  .stat-lab { font-size: 13px; color: var(--ink-2); line-height: 1.35; }
+  .stat-src { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; color: var(--muted); letter-spacing: 0.03em; }
+
+  /* ---------- panels ---------- */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .panel-head { display: flex; flex-direction: column; gap: 5px; }
+
+  /* ---------- filters ---------- */
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    align-items: flex-end;
+  }
+  .filter-group { display: flex; flex-direction: column; gap: 7px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    font-family: "IBM Plex Sans", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-2);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 6px 11px;
+    cursor: pointer;
+    line-height: 1.2;
+  }
+  .chip:hover { border-color: var(--border-firm); color: var(--ink); }
+  .chip[aria-pressed="true"] {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--surface);
+  }
+  .chip .ct { font-family: "IBM Plex Mono", monospace; font-size: 11px; opacity: 0.65; margin-left: 5px; }
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+  /* ---------- matrix + dossier ---------- */
+  .matrix-wrap {
+    display: grid;
+    grid-template-columns: minmax(0, 1.62fr) minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+  }
+  @media (max-width: 960px) { .matrix-wrap { grid-template-columns: 1fr; } }
+
+  .chart-frame { width: 100%; }
+  svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .axis-txt { font-family: "IBM Plex Mono", monospace; font-size: 11px; fill: var(--muted); }
+  .axis-title { font-family: "IBM Plex Sans", sans-serif; font-size: 12px; font-weight: 600; fill: var(--ink-2); letter-spacing: 0.02em; }
+  .quad-txt { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; fill: var(--muted); letter-spacing: 0.07em; text-transform: uppercase; }
+  .pt-label { font-family: "IBM Plex Sans", sans-serif; font-size: 12.5px; font-weight: 600; fill: var(--ink); }
+  .mark { cursor: pointer; }
+  .mark:hover .mk, .mark.sel .mk { stroke: var(--accent); stroke-width: 2.5; }
+
+  /* legend */
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center; }
+  .legend-set { display: flex; flex-wrap: wrap; gap: 6px 13px; align-items: center; }
+  .lg { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--ink-2); }
+  .lg-sw { width: 13px; height: 13px; border-radius: 50%; flex: none; }
+  .lg-lab { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+
+  /* ---------- dossier ---------- */
+  .dossier {
+    background: var(--surface);
+    border: 1px solid var(--border-firm);
+    border-top: 3px solid var(--accent);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    position: sticky;
+    top: 16px;
+  }
+  @media (max-width: 960px) { .dossier { position: static; } }
+  .dos-head { display: flex; flex-direction: column; gap: 6px; }
+  .dos-name { font-family: Archivo, sans-serif; font-weight: 800; font-size: 24px; line-height: 1.1; letter-spacing: -0.02em; }
+  .dos-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .dos-scores { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); }
+  .dos-score { background: var(--surface-2); padding: 9px 10px; display: flex; flex-direction: column; gap: 2px; }
+  .dos-score .v { font-family: Archivo, sans-serif; font-weight: 700; font-size: 20px; line-height: 1; }
+  .dos-score .k { font-family: "IBM Plex Mono", monospace; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .dos-block { display: flex; flex-direction: column; gap: 4px; }
+  .dos-block .k {
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 0.11em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .dos-block .v { font-size: 13.5px; color: var(--ink-2); line-height: 1.5; }
+  .dos-verdict {
+    background: var(--accent-wash);
+    border-left: 3px solid var(--accent);
+    padding: 10px 12px;
+    font-size: 13.5px;
+    color: var(--ink);
+  }
+  .src-list { display: flex; flex-wrap: wrap; gap: 4px 8px; }
+  .src-list a { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--accent-ink); text-decoration: none; border-bottom: 1px solid var(--accent); }
+  .src-list a:hover { background: var(--accent-wash); }
+  .src-int { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--muted); }
+
+  /* ---------- pills ---------- */
+  .pill {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 3px 7px;
+    border-radius: 2px;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .pill-high { background: var(--ov-high); color: var(--ov-high-ink); }
+  .pill-mid  { background: var(--ov-mid-wash); color: var(--ov-mid-ink); border: 1px solid var(--ov-mid); }
+  .pill-low  { background: var(--surface-2); color: var(--muted); border: 1px solid var(--border-firm); }
+  .pill-grp  { background: transparent; color: var(--ink-2); border: 1px solid var(--border-firm); }
+  .pill-cov-deep    { background: transparent; color: var(--ink); border: 1px solid var(--ink); }
+  .pill-cov-partial { background: transparent; color: var(--ink-2); border: 1px dashed var(--border-firm); }
+  .pill-cov-none    { background: var(--accent-wash); color: var(--accent-ink); border: 1px solid var(--accent); }
+
+  /* ---------- bars ---------- */
+  .bars { display: flex; flex-direction: column; gap: 5px; }
+  .bar-row {
+    display: grid;
+    grid-template-columns: 148px minmax(0, 1fr) 34px;
+    gap: 10px;
+    align-items: center;
+    cursor: pointer;
+    padding: 2px 0;
+  }
+  .bar-row:hover .bar-name { color: var(--accent-ink); }
+  .bar-name { font-size: 13px; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bar-track { display: block; height: 13px; background: var(--surface-2); border: 1px solid var(--border); position: relative; }
+  .bar-fill { display: block; height: 100%; border-radius: 0 4px 4px 0; }
+  .bar-val { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--ink-2); text-align: right; }
+  @media (max-width: 560px) { .bar-row { grid-template-columns: 108px minmax(0, 1fr) 30px; } }
+
+  /* ---------- table ---------- */
+  .table-scroll { overflow-x: auto; border: 1px solid var(--border); }
+  table { border-collapse: collapse; width: 100%; min-width: 900px; font-size: 13.5px; }
+  thead th {
+    text-align: left;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    padding: 10px 12px;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--border-firm);
+    white-space: nowrap;
+  }
+  thead th.sortable { cursor: pointer; user-select: none; }
+  thead th.sortable:hover { color: var(--ink); }
+  thead th[aria-sort] { color: var(--accent-ink); }
+  thead th .arrow { opacity: 0.9; }
+  tbody td { padding: 10px 12px; border-bottom: 1px solid var(--grid); vertical-align: top; color: var(--ink-2); }
+  tbody tr { cursor: pointer; background: var(--surface); }
+  tbody tr:hover { background: var(--accent-wash); }
+  tbody tr.sel { background: var(--accent-wash); box-shadow: inset 3px 0 0 var(--accent); }
+  td.name { color: var(--ink); font-weight: 600; white-space: nowrap; }
+  .cell-score { display: flex; align-items: center; gap: 7px; }
+  .mini-track { display: block; width: 54px; height: 7px; background: var(--surface-2); border: 1px solid var(--border); flex: none; }
+  .mini-fill { display: block; height: 100%; background: var(--ink-2); border-radius: 0 3px 3px 0; }
+  .num { font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; }
+
+  /* ---------- shifts ---------- */
+  .shifts { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
+  .shift { display: flex; flex-direction: column; gap: 6px; padding-left: 13px; border-left: 2px solid var(--accent); }
+  .shift .when { font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: 0.06em; color: var(--accent-ink); }
+  .shift .what { font-family: Archivo, sans-serif; font-weight: 700; font-size: 14.5px; }
+  .shift .so { font-size: 13px; color: var(--ink-2); }
+
+  /* ---------- tooltip ---------- */
+  #tip {
+    position: fixed;
+    pointer-events: none;
+    z-index: 50;
+    background: var(--surface);
+    border: 1px solid var(--border-firm);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.16);
+    padding: 9px 11px;
+    max-width: 258px;
+    font-size: 12.5px;
+    color: var(--ink-2);
+    line-height: 1.45;
+  }
+  #tip .t-name { font-family: Archivo, sans-serif; font-weight: 700; font-size: 13.5px; color: var(--ink); margin-bottom: 3px; }
+  #tip .t-row { font-family: "IBM Plex Mono", monospace; font-size: 11.5px; color: var(--muted); }
+
+  /* ---------- method ---------- */
+  .method { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 18px; }
+  .method dl { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+  .method dt { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+  .method dd { margin: 0; font-size: 13px; color: var(--ink-2); }
+  footer { border-top: 1px solid var(--border-firm); padding-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<div class="shell">
+
+  <header class="masthead">
+    <div class="masthead-row">
+      <span class="eyebrow">Tiger Global · Portfolio diligence · 8 Sep 2026</span>
+      <span class="subject-tag">Augustus · Series B · $180M @ $1B</span>
+    </div>
+    <h1>Augustus Clearing Rivals</h1>
+    <p class="lede">Nineteen institutions are now building some version of always-on dollar
+      settlement. Only four are building the same product Augustus is: a chartered balance sheet
+      that lets a foreign financial institution clear USD without a correspondent chain.
+      This maps each rival on how far its commercial traction and its technology have actually
+      progressed — and how squarely it lands on Augustus's clearing wedge.</p>
+  </header>
+
+  <section class="stats" aria-label="Headline figures">
+    <div class="stat">
+      <span class="stat-val mono">19</span>
+      <span class="stat-lab">rivals mapped — 7 incumbent banks, 7 chartered challengers, 5 stablecoin networks</span>
+      <span class="stat-src">Tiger research + public filings</span>
+    </div>
+    <div class="stat">
+      <span class="stat-val mono">4</span>
+      <span class="stat-lab">score high overlap (≥7.5/10) with the Augustus clearing product</span>
+      <span class="stat-src">OpenReserve · Lorum · Column · Anchorage</span>
+    </div>
+    <div class="stat">
+      <span class="stat-val mono">$7B<span style="font-size:16px;font-weight:600">/day</span></span>
+      <span class="stat-lab">Kinexys payment volume — the incumbent benchmark Augustus is measured against</span>
+      <span class="stat-src">Augustus Research deck, Apr 2026</span>
+    </div>
+    <div class="stat">
+      <span class="stat-val mono">H1 &rsquo;27</span>
+      <span class="stat-lab">The Clearing House tokenized deposit network goes live, making 24/7 USD settlement table stakes</span>
+      <span class="stat-src">CoinDesk, Jun 2026</span>
+    </div>
+    <div class="stat">
+      <span class="stat-val mono" style="color:var(--accent-ink)">0</span>
+      <span class="stat-lab">internal files on OpenReserve — the highest-overlap rival on the board is a diligence blind spot</span>
+      <span class="stat-src">Cortex sweep: Egnyte, email, OneNote</span>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="matrix-h">
+    <div class="panel-head">
+      <h2 id="matrix-h">Positioning matrix — traction against buildout</h2>
+      <p class="note">Each rival placed by commercial traction (live volume, revenue, deposits, named clients)
+        and technology buildout (how much of the settlement stack actually runs). Shade shows overlap with
+        Augustus's clearing product; shape shows what kind of institution it is. Click any mark for the dossier.</p>
+    </div>
+
+    <div class="filters" role="group" aria-label="Filter competitors">
+      <div class="filter-group">
+        <span class="lg-lab" id="f-arch">Institution type</span>
+        <div class="chips" id="chips-arch" role="group" aria-labelledby="f-arch"></div>
+      </div>
+      <div class="filter-group">
+        <span class="lg-lab" id="f-ov">Overlap with Augustus</span>
+        <div class="chips" id="chips-ov" role="group" aria-labelledby="f-ov"></div>
+      </div>
+    </div>
+
+    <div class="matrix-wrap">
+      <div>
+        <div class="chart-frame">
+          <svg id="matrix" viewBox="0 0 960 620" role="img"
+               aria-label="Scatter plot of competitors by commercial traction and technology buildout, shaded by overlap with Augustus"></svg>
+        </div>
+        <div class="legend" style="margin-top:14px">
+          <div class="legend-set">
+            <span class="lg-lab">Overlap</span>
+            <span class="lg"><span class="lg-sw" style="background:var(--ov-high)"></span>High 7.5–10</span>
+            <span class="lg"><span class="lg-sw" style="background:var(--ov-mid)"></span>Medium 5–7.4</span>
+            <span class="lg"><span class="lg-sw" style="background:var(--ov-low)"></span>Low &lt;5</span>
+          </div>
+          <div class="legend-set">
+            <span class="lg-lab">Type</span>
+            <span class="lg"><svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><rect x="2.5" y="2.5" width="10" height="10" rx="1.5" fill="var(--ink-2)"/></svg>Incumbent bank</span>
+            <span class="lg"><svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><circle cx="7.5" cy="7.5" r="5.5" fill="var(--ink-2)"/></svg>Chartered challenger</span>
+            <span class="lg"><svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><polygon points="7.5,1.8 13.4,12.6 1.6,12.6" fill="var(--ink-2)"/></svg>Network &amp; infra</span>
+            <span class="lg"><svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><polygon points="7.5,1.2 13.8,7.5 7.5,13.8 1.2,7.5" fill="var(--ink)" stroke="var(--accent)" stroke-width="2"/></svg>Augustus</span>
+          </div>
+        </div>
+        <p class="tiny" style="margin-top:10px">Scores are Tiger's read of the cited evidence, not company-reported metrics.
+          Every number is also in the table below.</p>
+      </div>
+
+      <aside class="dossier" id="dossier" aria-live="polite" aria-label="Competitor dossier"></aside>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="ov-h">
+    <div class="panel-head">
+      <h2 id="ov-h">Overlap with the Augustus clearing product</h2>
+      <p class="note">How much of the rival's offer competes for the same mandate: a foreign or
+        underbanked financial institution buying always-on USD clearing on a regulated balance sheet.
+        Deposit-taking, custody and consumer businesses score low even where the company is large.</p>
+    </div>
+    <div class="bars" id="bars"></div>
+  </section>
+
+  <section class="panel" aria-labelledby="tbl-h">
+    <div class="panel-head">
+      <h2 id="tbl-h">Full comparison</h2>
+      <p class="note">Sort any column. Click a row to load its dossier above.</p>
+    </div>
+    <div class="table-scroll">
+      <table id="tbl">
+        <thead>
+          <tr>
+            <th class="sortable" data-k="name">Competitor</th>
+            <th class="sortable" data-k="group">Type</th>
+            <th>Charter &amp; licence status</th>
+            <th class="sortable" data-k="traction">Commercial traction</th>
+            <th class="sortable" data-k="tech">Tech buildout</th>
+            <th class="sortable" data-k="overlap">Overlap</th>
+            <th>Where it lands on Augustus</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <p class="tiny" id="tbl-count"></p>
+  </section>
+
+  <section class="panel" aria-labelledby="shift-h">
+    <div class="panel-head">
+      <h2 id="shift-h">Three structural moves that reprice the whole set</h2>
+      <p class="note">None of these is a company Augustus sells against. Each changes what the buyer
+        expects as standard.</p>
+    </div>
+    <div class="shifts">
+      <div class="shift">
+        <span class="when">Announced Jun 2026 · live H1 2027</span>
+        <span class="what">The Clearing House deposit token</span>
+        <span class="so">JPMorgan, Citi, Bank of America, Wells Fargo and more than a dozen peers are
+          pooling tokenized deposits on one TCH-operated network. It makes 24/7 programmable USD
+          settlement an expectation rather than a differentiator — but only between member banks'
+          own deposits, which is precisely the set of institutions Augustus does not target.</span>
+      </div>
+      <div class="shift">
+        <span class="when">2026 charter cycle</span>
+        <span class="what">The OCC opened the gate</span>
+        <span class="so">Erebor (Feb), Coinbase (Apr), Circle (Jul), World Liberty (Aug) and OpenReserve
+          (Sep) all cleared OCC approval inside eight months, alongside Augustus's own conditional
+          approval in May. The scarce national charter that anchors Augustus's moat is getting less
+          scarce — though full-service charters with deposit powers remain in the single digits.</span>
+      </div>
+      <div class="shift">
+        <span class="when">2026</span>
+        <span class="what">Distribution bought the rails</span>
+        <span class="so">Stripe took Bridge for $1.1B and Mastercard agreed to take BVNK for up to
+          $1.8B. Stablecoin orchestration is no longer a startup layer Augustus competes with — it is
+          a feature of two networks that already sit in front of every merchant and issuer.</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="cav-h">
+    <div class="panel-head">
+      <h2 id="cav-h">Four things the field said against the thesis</h2>
+      <p class="note">From Tiger's own expert and customer calls. These bear on how much the
+        overlap scores actually matter.</p>
+    </div>
+    <div class="shifts">
+      <div class="shift">
+        <span class="when">Kraken · expert call</span>
+        <span class="what">Instant settlement needs a closed loop</span>
+        <span class="so">Both counterparties have to bank with Augustus for settlement to be
+          genuinely instant. Until the network has both sides of a corridor, the product is a
+          faster correspondent, not a replacement — which is why the interoperable-network idea
+          with Anchorage and Ripple Bank keeps coming up.</span>
+      </div>
+      <div class="shift">
+        <span class="when">Kraken · expert call</span>
+        <span class="what">Stablecoin settlement is "not game-changing"</span>
+        <span class="so">At current cost structures the stablecoin leg was described as
+          interesting rather than decisive. The pitch that wins is compliance speed and
+          always-on access, not the rail itself.</span>
+      </div>
+      <div class="shift">
+        <span class="when">Fed policy · in flight</span>
+        <span class="what">Skinny master accounts and FedNow</span>
+        <span class="so">A skinny master account plus FedNow and RTP adoption could compress the
+          USD-clearing edge for everyone — the deck's own FedNow series shows quarterly settled
+          volume going from $2bn in 2Q24 to $1.09tn by 1Q26, though still under 10bps of Fedwire.</span>
+      </div>
+      <div class="shift">
+        <span class="when">Multiple calls</span>
+        <span class="what">Complement, not replacement</span>
+        <span class="so">Customers consistently framed Augustus as a complement to their
+          correspondent banks and wanted to see the US entity mature with Tier 1 clients before
+          deepening. That caps near-term wallet share regardless of what rivals do.</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="m-h">
+    <div class="panel-head">
+      <h2 id="m-h">How to read the scores</h2>
+    </div>
+    <div class="method">
+      <dl>
+        <dt>Commercial traction · 0–10</dt>
+        <dd>Evidence of paid, live volume: settled volume or revenue, deposits gathered,
+          named institutional clients, corridor coverage. A funding round is not traction; a
+          pre-operational charter scores 1–3 however well capitalised.</dd>
+      </dl>
+      <dl>
+        <dt>Technology buildout · 0–10</dt>
+        <dd>How much of the settlement stack runs in production versus sits in a pilot or a
+          filing: own core versus vendor core, direct rail connectivity, whether tokenized
+          settlement is a product or a bolt-on to a legacy mainframe.</dd>
+      </dl>
+      <dl>
+        <dt>Overlap · 0–10</dt>
+        <dd>Contest for the same mandate — a non-US or underbanked FI buying always-on USD
+          clearing on a regulated balance sheet. Same buyer and same promise scores 8+;
+          adjacent rails or a different customer scores below 5.</dd>
+      </dl>
+      <dl>
+        <dt>Augustus baseline</dt>
+        <dd>Traction 4.0 · Buildout 7.0. Live euro clearing on the legacy Ivy rails with Kraken,
+          Bitpanda and KuCoin and billions of euros a year; USD clearing conditionally chartered
+          in May 2026 but not yet at scale.</dd>
+      </dl>
+      <dl>
+        <dt>Internal file · deep / partial / none</dt>
+        <dd>How much of Tiger's own diligence covers the rival, from a sweep of Egnyte research,
+          email, attachments and OneNote. <em>Deep</em> means a dedicated deck section, filing or
+          expert call; <em>none</em> means the assessment rests entirely on public sources and
+          should be treated as provisional.</dd>
+      </dl>
+    </div>
+  </section>
+
+  <footer>
+    <p class="tiny"><strong>Internal sources:</strong>
+      Augustus Research deck (Jun 2026) · Augustus Clearing Overview v6 (May 2026) ·
+      Augustus Expert Call Summary v1–v3 (Jul 2026) · Augustus Customer Call Tracker v2 (Jul 2026) ·
+      Augustus company brief (Jun 2026) · Lorum Bank OCC application (filed 31 Mar 2026) ·
+      Column customer call, Uzum Bank (Jun 2026) · Erebor customer call, Tools for Humanity (Jun 2026)
+      — all under
+      <span class="mono">/Shared/Research/02. Private Companies/01. Portfolio Companies/Augustus</span>.
+      A Cortex sweep found no material on OpenReserve in any internal corpus.</p>
+    <p class="tiny"><strong>Public sources</strong> are linked per rival in the dossier panel.
+      Market-share and TAM figures trace to McKinsey, Coalition Greenwich and Morgan Stanley /
+      Oliver Wyman as cited in the Augustus Research deck.</p>
+    <p class="tiny">Scores are analyst judgement on the evidence shown and will move with each
+      new datapoint. Not investment advice.</p>
+  </footer>
+</div>
+
+<div id="tip" hidden></div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ------------------------------------------------------------------ data */
+  const GROUPS = {
+    incumbent:  { label: "Incumbent bank",       shape: "square"   },
+    challenger: { label: "Chartered challenger", shape: "circle"   },
+    network:    { label: "Network & infra",      shape: "triangle" }
+  };
+
+  const AUG = { name: "Augustus", traction: 4.0, tech: 7.0 };
+
+  const DATA = [
+    {
+      id: "jpm", name: "JPMorgan · Kinexys", group: "incumbent", coverage: "deep",
+      traction: 9.5, tech: 9.0, overlap: 6,
+      charter: "Full-service national bank; Fed member",
+      label: { dx: -14, dy: -14, anchor: "end" },
+      one: "The pace-setter. Kinexys is the only bank tokenization platform operating at real scale, and JPMD is the first bank deposit token live on public chains.",
+      tractionEv: "~$10tn cleared daily, roughly 30% of USD SWIFT traffic and about twice Citi's volume, on ~$20bn of clearing-related revenue. Kinexys ran ~$7bn/day of payments by April 2026, >$1.5tn cumulative, with payment volume up roughly 10x year over year. Named enterprise adopters include Siemens, BlackRock, Mitsubishi and BMW.",
+      techEv: "Described in Tiger's deck as the most mature tokenization platform of any major bank: 24/7/365 blockchain deposits between JPM clients, on-chain FX, digital repo financing. JPMD — the first major-bank deposit token on a public chain — went live on Base in Nov 2025 and began phasing onto Canton in Jan 2026.",
+      overlapEv: "Same buyer and the same 24/7 cross-border promise, but Kinexys is a bank-led network among JPMorgan's own clients — a walled garden, not a neutral bridge between national systems. Expert calls were blunt that Augustus should not compete here head-on.",
+      verdict: "Not the fight. JPMorgan sets the performance bar Augustus is judged against, and its clients are not Augustus's clients. Watch instead for Kinexys opening to non-JPM institutions — that is the day the overlap score moves.",
+      sources: [
+        { l: "Kinexys 2026 milestones", u: "https://www.jpmorgan.com/payments/newsroom/kinexys-milestones-2026" },
+        { l: "JPMD on Canton", u: "https://blog.digitalasset.com/news/digital-asset-and-kinexys-by-j.p.-morgan-bring-usd-jpm-coin-jpmd-natively-to-canton" }
+      ]
+    },
+    {
+      id: "citi", name: "Citi · Token Services", group: "incumbent", coverage: "deep",
+      traction: 8.5, tech: 6.0, overlap: 6.5,
+      charter: "Full-service national bank; 270+ clearing memberships in 94 countries",
+      label: { dx: 14, dy: 4, anchor: "start" },
+      one: "The deepest emerging-market network in banking, running tokenized deposits on a 1972 mainframe.",
+      tractionEv: "$5–6tn cleared daily and ~$18bn of clearing revenue; Citi's highest-ROTCE segment at 27%+, with over 70% of Services revenue earned outside the US across 270+ clearing memberships in 94 countries. Token Services runs live transfers between New York, London and Hong Kong, and a tokenized deposit launched on Base in 2026.",
+      techEv: "Tiger's deck puts Citi Token Services 2–3 years behind Kinexys: a narrower suite bolted onto mainframes first launched in 1972, functional only between Citi branches, with Maersk and a canal authority the only named pilot clients — \"incrementally better, just a faster internal ledger.\" Jane Fraser confirmed the bank is studying its own stablecoin; a Coinbase partnership adds stablecoin rails.",
+      overlapEv: "The highest incumbent overlap after Standard Chartered. Citi's EM footprint is the alternative a bank in Latin America, Southeast Asia or Africa already has — exactly the corridors Augustus is funding with its Series B.",
+      verdict: "The incumbent Augustus displaces at the margin, corridor by corridor, on speed and on the corridors Citi has exited. Its legacy core is the concrete weakness; its 94-country clearing membership is the thing Augustus cannot replicate quickly.",
+      sources: [
+        { l: "Citi Token Services expansion", u: "https://www.citigroup.com/global/news/press-release/2025/citi-unveils-strategic-expansion-citi-token-services-euro-integration" },
+        { l: "Citi wins bank support", u: "https://www.americanbanker.com/payments/news/citi-wins-bank-support-for-tokenized-deposit-tools" }
+      ]
+    },
+    {
+      id: "stanchart", name: "Standard Chartered", group: "incumbent", coverage: "deep",
+      traction: 7.0, tech: 5.0, overlap: 7,
+      charter: "UK bank; Anchorpoint HKMA stablecoin issuer licence",
+      label: { dx: 14, dy: 5, anchor: "start" },
+      one: "The incumbent standing on Augustus's exact corridors — and now issuing its own stablecoin.",
+      tractionEv: "~$5bn of clearing revenue across 120 currencies and the emerging-market footprint Augustus is targeting in Asia, Africa and the Middle East. It now lets institutional clients mint and redeem USDC through the bank, fully acquired Zodia Custody, and in Sep 2026 became the first top global bank to offer BTC and ETH trading in the UAE.",
+      techEv: "Tiger's competitive table records its tokenized posture as one line — \"poached the JPM Kinexys head\" — with no productized platform, and negative FX-neutral growth in the landscape slide. But it launched stablecoin rails with BNY and its Anchorpoint subsidiary begins phased HKD-stablecoin issuance from Q2 2026.",
+      overlapEv: "Highest overlap of any incumbent. Standard Chartered's franchise across ~54 emerging-market countries is built on moving money where other banks have no coverage — the identical pitch to the underserved and grey-jurisdiction institutions Augustus is courting, but with 120 currencies and licences already in place. Expert calls landed on the uncomfortable version of this: institutional credibility requires a large balance sheet.",
+      verdict: "The incumbent to watch most closely, not the biggest one. A credible StanChart tokenized clearing product aimed at EM correspondent relationships would compress Augustus's window faster than anything JPMorgan does.",
+      sources: [
+        { l: "StanChart + BNY stablecoin rails", u: "https://www.americanbanker.com/news/why-standard-chartered-bny-launched-stablecoin-rails" },
+        { l: "Spot crypto in the UAE", u: "https://www.coindesk.com/business/2026/09/03/standard-chartered-first-top-global-bank-to-offer-bitcoin-and-ether-trading-in-uae" }
+      ]
+    },
+    {
+      id: "hsbc", name: "HSBC", group: "incumbent", coverage: "deep",
+      traction: 7.5, tech: 4.0, overlap: 5,
+      charter: "UK bank; global clearing memberships",
+      one: "The Asia trade corridor incumbent, with no tokenized cash rail to point at.",
+      tractionEv: "$1–2tn cleared daily, ~$12bn of clearing revenue, roughly $600tn of annual payment value across 130+ currencies, and more than 1,000 fintech partnerships. The only bank clearing USD during Asian hours.",
+      techEv: "Tiger's competitive landscape identifies no tokenized rail at HSBC. Its differentiation is network and trade finance, not settlement technology.",
+      overlapEv: "Overlaps on the one thing Augustus sells hardest — dollar settlement outside New York hours — but only in the Asia trade corridor, and via correspondent relationships rather than a programmable rail.",
+      verdict: "A partner-shaped incumbent. HSBC's Asian-hours USD franchise is the proof that the demand Augustus is chasing is real, and its lack of a token rail makes it a plausible customer rather than a rival.",
+      sources: []
+    },
+    {
+      id: "bny", name: "BNY", group: "incumbent", coverage: "partial",
+      traction: 5.5, tech: 4.5, overlap: 3,
+      charter: "US national bank; custody-led",
+      one: "Securities and custody, not cash clearing — adjacent rather than competitive.",
+      tractionEv: "About $880m of clearing-related revenue excluding securities, against a custody and asset-servicing franchise many multiples larger. High ROTCE, narrow cash-clearing exposure.",
+      techEv: "No tokenized payments product in Tiger's landscape, though BNY launched stablecoin rails jointly with Standard Chartered in 2026.",
+      overlapEv: "Different business. BNY competes for asset-manager custody and securities settlement; Augustus competes for FI dollar payment flow.",
+      verdict: "Low priority as a competitor, real as a reference: BNY moving into stablecoin rails is another signal that the incumbents intend to hold this ground.",
+      sources: [
+        { l: "StanChart + BNY stablecoin rails", u: "https://www.americanbanker.com/news/why-standard-chartered-bny-launched-stablecoin-rails" }
+      ]
+    },
+    {
+      id: "db", name: "Deutsche Bank", group: "incumbent", coverage: "partial",
+      traction: 6.0, tech: 3.5, overlap: 4,
+      charter: "German universal bank; global clearing",
+      one: "A meaningful transaction bank with no tokenized differentiation of its own — and a compliance history that supports the Augustus thesis.",
+      tractionEv: "Roughly 4% share of the narrower $236bn major-bank transaction-banking pool. Still the majority USD clearer for several EM banks Augustus has pitched — one Uzbek client clears the bulk of its dollars through DB today.",
+      techEv: "No proprietary blockchain product in Tiger's deck. It is instead contributing design expertise to Circle's Payments Network alongside Santander, SocGen and Standard Chartered.",
+      overlapEv: "Overlaps as the incumbent provider being displaced rather than as a technology rival. Its AML and correspondent-banking enforcement history is part of why terminated corridors are available to Augustus at all.",
+      verdict: "Displacement target more than competitor — and its choice to help build someone else's stablecoin network rather than its own is the tell.",
+      sources: [
+        { l: "Circle Payments Network", u: "https://www.circle.com/pressroom/circle-announces-payments-network-to-transform-global-money-movement" }
+      ]
+    },
+    {
+      id: "tch", name: "TCH deposit network", group: "incumbent", coverage: "none",
+      traction: 2.0, tech: 3.0, overlap: 6,
+      charter: "Consortium operated by The Clearing House",
+      one: "Not a company — the incumbents' collective answer, and the reason 24/7 settlement stops being a feature in 2027.",
+      tractionEv: "Announced June 2026, targeting first-half 2027 launch. No live volume. Founding members are JPMorgan, Citi, Bank of America and Wells Fargo, with more than a dozen additional banks joining.",
+      techEv: "Pre-build. The design intent is instant 24/7 movement of tokenized commercial-bank deposits across member banks, connecting existing bank rails to blockchain infrastructure.",
+      overlapEv: "Neutralises Augustus's headline claim — always-on programmable dollar settlement — for anyone banking with a US member institution. It does nothing for a foreign FI that cannot get a US member bank to take it on, which is Augustus's actual customer.",
+      verdict: "The single most important dated risk on this board. If TCH ships on time and opens to foreign member access, Augustus's differentiation narrows to the institutions US banks will not serve — a smaller, but still real, market.",
+      sources: [
+        { l: "CoinDesk: shared tokenized network", u: "https://www.coindesk.com/markets/2026/06/05/jpmorgan-bank-of-america-and-citi-are-going-on-the-blockchain-offensive-with-a-shared-tokenized-network" },
+        { l: "Finextra: 2027 launch", u: "https://www.finextra.com/newsarticle/47870/major-us-banks-to-launch-tokenised-deposit-network-in-2027" }
+      ]
+    },
+
+    {
+      id: "column", name: "Column", group: "challenger", coverage: "deep",
+      traction: 9.0, tech: 8.5, overlap: 8.5,
+      charter: "Owns a US national bank charter; direct Fed connectivity",
+      label: { dx: -13, dy: 20, anchor: "end" },
+      one: "Called \"the real competition\" in Tiger's own expert calls — a self-built bank core on an owned charter, profitable and unfunded, and already piloting EM clearing.",
+      tractionEv: "Tiger's June research puts Column at roughly $500m of revenue growing 2x year over year, $1.2bn of deposits on only $50m of paid-in capital, and a 9.6% net interest margin against a ~3% industry norm — bootstrapped by William Hockey after buying a small California bank in 2021. (Public estimates are far lower, at $150–200m for 2025; treat the internal figure as the diligence number and the gap as a question to close.) Customers rate its API best-in-class, with same-day ACH plus RTP and FedNow.",
+      techEv: "The one rival that matches the Augustus architecture rather than approximating it: a bank core built from scratch under a charter Column owns, wired directly to the Fed, with compliance cycles fast enough to win on onboarding alone.",
+      overlapEv: "Directly contests the mandate, and has already landed in Augustus's own corridor — Column won Uzum Bank in Uzbekistan on streamlined compliance and is piloting clearing with EM digital banks. Two offsets: its core base is still US fintechs and its current product push is lending, not clearing; and it prices ACH at 4–5x rack rate, 2–5x even after negotiation, which leaves Augustus room to undercut.",
+      verdict: "The competitor to build against. Augustus wins where Column is weak: price, stablecoin settlement reliability, and a non-US institutional footprint Column has not built. The fact that Column is drifting toward lending is the opening — if it turns clearing into a first-class product, the price advantage is all Augustus has left.",
+      sources: [
+        { l: "Sacra: Column", u: "https://sacra.com/c/column/" },
+        { l: "Lead Bank vs Column", u: "https://sacra.com/research/lead-bank-vs-column/" }
+      ]
+    },
+    {
+      id: "erebor", name: "Erebor", group: "challenger", coverage: "deep",
+      traction: 8.5, tech: 4.5, overlap: 6.5,
+      charter: "OCC national bank charter, final approval Feb 2026",
+      label: { dx: 14, dy: 5, anchor: "start" },
+      one: "Tiger's files call it \"the closest comp\" — a deposit-gathering machine whose product, on customer evidence, does not yet match the pitch.",
+      tractionEv: "Grew out of the stablecoin startup Atticus in 2025 with Palmer Luckey leading. Opened 9 Feb 2026 with $635m of capital and passed $4.6bn of deposits within six months — $1.1bn in late March to $4.05bn by early July — largely from hard-tech and defence manufacturers. Internal diligence tracked the valuation from $2bn pre-money in May 2025 to $4bn in December to a $7–8bn raise in May 2026; press now reports a ~$1.5bn round at $8bn or more.",
+      techEv: "Broad on paper — fiat and stablecoin deposits, crypto-backed and GPU/TPU-hardware-backed lending, blockchain payments and conversion, BaaS, treasury — and Sui support plus Infinite's fiat/stablecoin accounts run on it. The customer read splits: Tools for Humanity rates it 10/10 for the narrow job of off-ramping USDC to USD, no fees and under 24 hours to onboard, while Kraken describes \"aggressive sales, execution issues\" and a bank that \"overpromises and under-delivers on tech execution.\"",
+      overlapEv: "Its charter application explicitly covers international companies seeking USD rails, including foreign correspondent relationships, and Tiger's own comp deck names it the closest comparable. But the live wedge is US innovation-economy deposits and lending yield, not foreign FI clearing.",
+      verdict: "Compete on delivery, not on charter. The underperforming end of Erebor's client base is a ready rip-and-replace list and the fastest commercial win on this board — but the $8bn mark it is raising at also sets the comp Augustus's own next round is priced against.",
+      sources: [
+        { l: "Banking Dive: charter granted", u: "https://www.bankingdive.com/news/erebor-bank-receives-national-bank-charter/811724/" },
+        { l: "Deposits quadruple, $8bn target", u: "https://thenextweb.com/news/erebor-bank-palmer-luckey-8bn-valuation" },
+        { l: "Infinite accounts on Erebor", u: "https://www.theblock.co/post/398377/b2b-stablecoin-tech-provider-infinite-rolls-out-banking-services-powered-by-thiel-backed-erebor-bank" }
+      ]
+    },
+    {
+      id: "openreserve", name: "OpenReserve", group: "challenger", coverage: "none",
+      traction: 1.5, tech: 3.0, overlap: 9,
+      charter: "OCC preliminary conditional approval, Sep 2026; FDIC pending",
+      label: { dx: 16, dy: 4, anchor: "start" },
+      one: "The closest positional match on the board — the same product thesis, three years behind on execution, and zero internal coverage.",
+      tractionEv: "Pre-operational. A $25m seed led by a16z crypto in April 2026 with Jump, Acrew, Coinbase Ventures, Clocktower, Quona and AAF. It must raise at least $210m of initial paid-in capital net of organisational costs and hold a 12% Tier 1 leverage ratio for three years before it can open.",
+      techEv: "A blockchain-native core in build, branchless, founded by former MoneyLion executives. Nothing in production; the charter arrived in under five months but the capital gate is the binding constraint.",
+      overlapEv: "The business plan reads like Augustus's: tokenized deposits, treasury management, foreign correspondent banking, an institutional banking-as-a-service platform, and a separate wholly-owned subsidiary issuing reserve-backed USD stablecoins. It is explicitly aimed at the \"Fedwire dead zone\" — settlement while the Fed is closed.",
+      verdict: "Highest overlap, lowest progress — and a diligence gap. A sweep of Egnyte, email and OneNote returns zero internal mentions of OpenReserve, so everything here is public. Augustus's advantage is a two-to-three-year head start and live euro revenue; the risk is a16z closing the $210m gap fast behind a cleaner, purpose-built stack. First action on this board: an expert call and a proper file.",
+      sources: [
+        { l: "a16z-led $25m seed", u: "https://cryptobriefing.com/openreserve-25m-seed-a16z-crypto/" },
+        { l: "The $210m capital bar", u: "https://coinpaprika.com/news/openreserve-clears-first-occ-gate-210-million/" },
+        { l: "Conditional approval", u: "https://cfotech.news/story/openreserve-wins-conditional-us-national-bank-approval" }
+      ]
+    },
+    {
+      id: "lorum", name: "Lorum", group: "challenger", coverage: "deep",
+      traction: 4.0, tech: 6.0, overlap: 8.5,
+      charter: "Dubai-licensed and operating; Lorum National Trust Bank, N.A. filed with the OCC 31 Mar 2026",
+      label: { dx: -14, dy: -13, anchor: "end" },
+      one: "Markets itself as the correspondent banking alternative, is one charter away from a Fed account — and Tiger holds the filing.",
+      tractionEv: "Live out of Dubai as a specialist correspondent institution providing clearing, custody and cash management to regulated financial firms — payroll operators and payment service providers. Customers are largely European FIs plus small and mid-market US banks and payments companies. Run by BVNK alumni: CEO George Davis co-founded BVNK and was its CPO, after TrueLayer and Paymentsense Dojo; director James Smith was BVNK's VP of engineering. The board adds George Rzepecki (Raba), Georges Makhoul (ex-Morgan Stanley MENA) and Penny Turnbridge (ex-UBS COO).",
+      techEv: "Direct access to major payment rails through a single API and ledger, issuing regulated custody accounts in the end customer's name. The interagency application — sponsored by Lorum Group Holdings out of 115 Broadway, New York — describes institutional clearing and settlement for both USD and tokenized assets, including stablecoins and tokenized money-market funds, plus custody and treasury/FX, and explicitly no lending.",
+      overlapEv: "Same customer, same sentence, same diagnosis: the filing's stated purpose is direct compliant USD access through named-account custody specifically to reduce nesting risk in correspondent banking. A trust charter would let Lorum apply for a Federal Reserve account, ending its partner-bank dependency and putting it on the rails Augustus's charter was supposed to secure uniquely.",
+      verdict: "The most under-priced threat on the board — and the one we can read in full, since we hold the application. Lorum reaches Augustus's customer without carrying deposit or credit risk, so it moves faster and prices thinner. Augustus's counter is precisely the thing Lorum disclaimed: a balance sheet, meaning settlement finality and intraday credit a trust company cannot legally offer.",
+      sources: [
+        { l: "Banking Dive: trust charter filing", u: "https://www.bankingdive.com/news/cash-management-platform-applies-national-trust-charter/816851/" },
+        { l: "Behind the idea: Lorum", u: "https://thefintechtimes.com/behind-the-idea-lorum/" }
+      ]
+    },
+    {
+      id: "anchorage", name: "Anchorage Digital", group: "challenger", coverage: "partial",
+      traction: 6.5, tech: 7.5, overlap: 8,
+      charter: "First OCC-chartered digital-asset bank (trust)",
+      label: { dx: -14, dy: -13, anchor: "end" },
+      one: "Shipped a nostro-replacement for non-US banks in February 2026 — the same pitch as Augustus, a year earlier.",
+      tractionEv: "Launched Stablecoin Solutions for Banks on 19 Feb 2026 for licensed international banks, followed by a tokenized deposit platform in June. It has said it has a pipeline of up to 20 large firms wanting to issue stablecoins through it, and mints and redeems tokens including Tether's USA₮, Ethena's USDtb, OSL's USDGO and Western Union's forthcoming USDPT.",
+      techEv: "A single federally regulated platform bundling stablecoin mint and redemption, custody, fiat treasury and settlement, with both stablecoin and fiat wallets for participating banks. Mature, custody-hardened infrastructure — but a trust charter, not a deposit-taking bank.",
+      overlapEv: "The most explicit head-on positioning of any rival: replacing pre-funded nostro and vostro accounts with programmable stablecoin balances for licensed international banks. That is the Augustus deck's own opening argument.",
+      verdict: "Beat it on the balance sheet or lose the segment. Anchorage cannot hold corporate transaction deposits or extend intraday credit under a trust charter — that gap is Augustus's whole answer, and it only holds while the full charter stays scarce. One expert instead floated the reverse: an interoperable stablecoin network across Augustus, Anchorage and Ripple Bank, which would solve the closed-loop problem none of them can solve alone.",
+      sources: [
+        { l: "Stablecoin stand-in for correspondent banking", u: "https://www.coindesk.com/business/2026/02/18/anchorage-digital-offers-non-u-s-banks-a-stablecoin-stand-in-for-correspondent-banking" },
+        { l: "Tokenized deposit platform", u: "https://www.coindesk.com/business/2026/06/19/anchorage-aims-to-bring-banks-onchain-with-new-tokenized-deposit-platform" },
+        { l: "Pipeline of ~20 issuers", u: "https://www.coindesk.com/business/2026/05/07/anchorage-says-it-has-a-pipeline-of-up-to-20-big-firms-looking-to-issue-stablecoins" }
+      ]
+    },
+    {
+      id: "lead", name: "Lead Bank", group: "challenger", coverage: "partial",
+      traction: 6.0, tech: 6.0, overlap: 5,
+      charter: "US state-chartered bank; crypto-friendly sponsor",
+      one: "A credible sponsor bank that keeps losing the head-to-heads to Column.",
+      tractionEv: "Live sponsor-banking business with fintech and crypto clients. It appears in the RFPs Augustus's prospects run, but Tiger's customer tracker shows it consistently placed behind Column on API quality and clearing speed.",
+      techEv: "Modern sponsor-bank stack with batch-hours settlement rather than continuous clearing — the specific limitation the Augustus brief calls out for the Lead and Column cohort.",
+      overlapEv: "Competes for the fintech sponsorship mandate, not for foreign FI dollar clearing. Overlaps on the domestic leg only.",
+      verdict: "Secondary. Relevant mainly as evidence of how these bake-offs are decided — API quality and settlement timing, not licence prestige.",
+      sources: [
+        { l: "Lead Bank vs Column", u: "https://sacra.com/research/lead-bank-vs-column/" }
+      ]
+    },
+    {
+      id: "crossriver", name: "Cross River", group: "challenger", coverage: "partial",
+      traction: 6.5, tech: 5.5, overlap: 4,
+      charter: "US state-chartered bank; sponsor and lending",
+      one: "Scaled sponsor bank, thin international bench.",
+      tractionEv: "An established sponsor and lending franchise with a large fintech client base. Evaluated by prospects in Tiger's tracker but marked down for having fewer international bank relationships and declining to commit to rail timelines.",
+      techEv: "Capable payments stack, oriented to domestic ACH, card and lending rather than cross-border settlement.",
+      overlapEv: "Mostly different business. It contests the US sponsorship leg while Augustus is selling cross-border clearing to non-US institutions.",
+      verdict: "Low. Its international gaps are the reason prospects keep looking for something like Augustus.",
+      sources: []
+    },
+
+    {
+      id: "circle", name: "Circle", group: "network", coverage: "partial",
+      traction: 9.0, tech: 8.0, overlap: 6.5,
+      charter: "Final OCC national trust bank approval, Jul 2026",
+      one: "The dominant dollar token, now with a charter and a payment network designed with four global banks.",
+      tractionEv: "USDC is the dominant regulated dollar stablecoin, with MiCA compliance plus UK, Singapore and Bermuda licences and public-market capital behind it. Circle Payments Network is being designed with Santander, Deutsche Bank, Société Générale and Standard Chartered contributing.",
+      techEv: "Mature issuance, reserve and attestation infrastructure, and CPN is a compliance-first routing network for FIs. What it is not is a clearing bank: a trust charter cannot take deposits or extend credit.",
+      overlapEv: "CPN routes cross-border payments without correspondent banks — the same outcome Augustus sells — and Circle's reserve-income model overlaps Augustus's net-interest economics. But Circle needs regulated institutions on both ends of a corridor; Augustus is trying to be that institution.",
+      verdict: "Partner and competitor at once. Augustus can settle CPN corridors as the chartered leg; the risk is CPN plus a member bank becoming good enough that no one needs a new clearing bank.",
+      sources: [
+        { l: "Final OCC approval", u: "https://www.circle.com/pressroom/circle-receives-final-occ-approval-to-establish-national-trust-bank" },
+        { l: "Circle Payments Network", u: "https://www.circle.com/pressroom/circle-announces-payments-network-to-transform-global-money-movement" }
+      ]
+    },
+    {
+      id: "ripple", name: "Ripple", group: "network", coverage: "partial",
+      traction: 7.0, tech: 7.0, overlap: 6,
+      charter: "NYDFS trust charter; national trust charter application filed",
+      one: "The longest-running attempt to replace correspondent banking, now chasing the same charter perimeter.",
+      tractionEv: "75+ global licences, RLUSD issued under a NYDFS trust charter, and a network spanning 300+ institutions in 55+ countries with partners including SBI Remit, Tranglo, Convera, Nium, Absa, Santander, PNC and Amex. Cumulative on-demand-liquidity payments have passed $95bn.",
+      techEv: "Production cross-border infrastructure with a decade of corridor engineering, plus a regulated dollar token. Weaker on the regulated-balance-sheet leg that settlement finality requires.",
+      overlapEv: "Same problem statement and, in some corridors, the same customers — but Ripple sells a network and a token to banks, where Augustus sells the account and the clearing relationship itself.",
+      verdict: "Established rather than accelerating. Its corridor partnerships are the realistic distribution Augustus lacks; its charter application is the thing to watch.",
+      sources: [
+        { l: "Ripple and Circle apply for charters", u: "https://www.dlnews.com/articles/regulation/stablecoin-giants-ripple-and-circle-apply-for-bank-charters/" },
+        { l: "Cross-border partners in 2026", u: "https://memeburn.com/companies-using-ripple-for-cross-border-payments/" }
+      ]
+    },
+    {
+      id: "bridge", name: "Bridge (Stripe)", group: "network", coverage: "partial",
+      traction: 8.0, tech: 7.5, overlap: 6,
+      charter: "None — operates through partner banks",
+      one: "Stablecoin orchestration with Stripe's distribution behind it. Rated a high threat in Tiger's own brief.",
+      tractionEv: "Acquired by Stripe for $1.1bn and now the stablecoin layer inside Stripe's merchant and platform base. Distribution, not licensing, is the moat.",
+      techEv: "Production orchestration across issuance, conversion and payout, hardened by Stripe-scale volume — but dependent on partner banks for the regulated leg.",
+      overlapEv: "Competes for the orchestration and payout mandate rather than the clearing mandate, and can undercut on the fintech end of Augustus's funnel. It cannot be the settlement counterparty of record.",
+      verdict: "Squeezes the fintech tier of Augustus's target list from above. The FI tier — banks that need a chartered counterparty, not an orchestration API — is where Augustus should concentrate.",
+      sources: []
+    },
+    {
+      id: "bvnk", name: "BVNK (Mastercard)", group: "network", coverage: "partial",
+      traction: 7.5, tech: 7.0, overlap: 6.5,
+      charter: "E-money and payment licences; no bank charter",
+      one: "Stablecoin payments plugged into Mastercard's network reach — and the alumni network that produced Lorum.",
+      tractionEv: "Mastercard agreed to acquire BVNK for up to $1.8bn in 2026 after the company scaled stablecoin payments across the US, Europe and Africa. Tiger's brief rates the threat high on network reach alone.",
+      techEv: "Mature multi-rail stablecoin payment infrastructure, now inheriting Mastercard's global scheme distribution and compliance apparatus.",
+      overlapEv: "Overlaps on the cross-border payment leg for PSPs and fintechs. It does not clear on its own balance sheet, so it competes for flow rather than for the clearing relationship — but with distribution Augustus cannot match.",
+      verdict: "Watch the founders as much as the company: a BVNK co-founder built Lorum, which is now filing for the charter perimeter Augustus depends on.",
+      sources: [
+        { l: "Banking Dive — notes the $1.8bn Mastercard deal", u: "https://www.bankingdive.com/news/cash-management-platform-applies-national-trust-charter/816851/" }
+      ]
+    },
+    {
+      id: "coinbase", name: "Coinbase", group: "network", coverage: "partial",
+      traction: 8.5, tech: 7.0, overlap: 4,
+      charter: "OCC conditional national trust charter, Apr 2026",
+      one: "The venue everyone else's tokens run on, competing for a different wallet.",
+      tractionEv: "The largest US exchange and USDC's distribution partner, with a conditionally approved national trust company for custody. Base now hosts both JPMD and Citi's tokenized deposit.",
+      techEv: "Strong custody and chain infrastructure; revenue remains volatile and trading-dependent, and the trust charter is custody-scoped.",
+      overlapEv: "Little direct contest for institutional USD clearing. Its relevance is as infrastructure the incumbents chose — which is what makes bank tokenization credible so quickly.",
+      verdict: "Not a competitor for the mandate. It is the reason the incumbents got to market faster than expected.",
+      sources: [
+        { l: "Coinbase OCC trust approval", u: "https://www.fintechweekly.com/news/coinbase-occ-national-trust-bank-clarity-act-2026" }
+      ]
+    }
+  ];
+
+  /* ------------------------------------------------------- scales & helpers */
+  const tier = v => (v >= 7.5 ? "high" : v >= 5 ? "mid" : "low");
+  const TIER_LABEL = { high: "High overlap", mid: "Medium overlap", low: "Low overlap" };
+  const COV_LABEL = { deep: "deep", partial: "partial", none: "none" };
+  const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const tierColor = t => cssVar(t === "high" ? "--ov-high" : t === "mid" ? "--ov-mid" : "--ov-low");
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const fmt = v => (Number.isInteger(v) ? v.toFixed(1) : v.toFixed(1));
+
+  const state = {
+    arch: "all",
+    ov: "all",
+    sel: "column",
+    sortKey: "overlap",
+    sortDir: -1
+  };
+
+  const visible = () => DATA.filter(d =>
+    (state.arch === "all" || d.group === state.arch) &&
+    (state.ov === "all" || tier(d.overlap) === state.ov)
+  );
+
+  /* --------------------------------------------------------------- filters */
+  function buildChips() {
+    const archWrap = document.getElementById("chips-arch");
+    const ovWrap = document.getElementById("chips-ov");
+
+    const archOpts = [{ k: "all", l: "All" }].concat(
+      Object.keys(GROUPS).map(k => ({ k, l: GROUPS[k].label }))
+    );
+    archWrap.innerHTML = archOpts.map(o => {
+      const n = o.k === "all" ? DATA.length : DATA.filter(d => d.group === o.k).length;
+      return `<button class="chip" type="button" data-dim="arch" data-v="${o.k}"
+        aria-pressed="${state.arch === o.k}">${esc(o.l)}<span class="ct">${n}</span></button>`;
+    }).join("");
+
+    const ovOpts = [
+      { k: "all", l: "All" }, { k: "high", l: "High" }, { k: "mid", l: "Medium" }, { k: "low", l: "Low" }
+    ];
+    ovWrap.innerHTML = ovOpts.map(o => {
+      const n = o.k === "all" ? DATA.length : DATA.filter(d => tier(d.overlap) === o.k).length;
+      return `<button class="chip" type="button" data-dim="ov" data-v="${o.k}"
+        aria-pressed="${state.ov === o.k}">${esc(o.l)}<span class="ct">${n}</span></button>`;
+    }).join("");
+
+    document.querySelectorAll(".chip").forEach(b => {
+      b.addEventListener("click", () => {
+        state[b.dataset.dim] = b.dataset.v;
+        b.parentElement.querySelectorAll(".chip").forEach(o =>
+          o.setAttribute("aria-pressed", String(o.dataset.v === b.dataset.v)));
+        renderAll();
+      });
+    });
+  }
+
+  /* ---------------------------------------------------------------- matrix */
+  const M = { w: 960, h: 620, l: 74, r: 34, t: 30, b: 62 };
+  const px = v => M.l + (v / 10) * (M.w - M.l - M.r);
+  const py = v => M.h - M.b - (v / 10) * (M.h - M.t - M.b);
+
+  function markSVG(shape, x, y, r, fill, extra) {
+    const st = `fill="${fill}" stroke="var(--surface)" stroke-width="2" class="mk" ${extra || ""}`;
+    if (shape === "square") return `<rect x="${x - r}" y="${y - r}" width="${2 * r}" height="${2 * r}" rx="2" ${st}/>`;
+    if (shape === "triangle") {
+      const h = r * 1.28;
+      return `<polygon points="${x},${y - h} ${x + h * 1.02},${y + h * 0.72} ${x - h * 1.02},${y + h * 0.72}" ${st}/>`;
+    }
+    if (shape === "diamond") {
+      const d = r * 1.34;
+      return `<polygon points="${x},${y - d} ${x + d},${y} ${x},${y + d} ${x - d},${y}" fill="var(--ink)" stroke="var(--accent)" stroke-width="2.5" class="mk"/>`;
+    }
+    return `<circle cx="${x}" cy="${y}" r="${r}" ${st}/>`;
+  }
+
+  function renderMatrix() {
+    const svg = document.getElementById("matrix");
+    const rows = visible();
+    const ticks = [0, 2, 4, 6, 8, 10];
+    let s = "";
+
+    // grid
+    ticks.forEach(t => {
+      s += `<line x1="${M.l}" y1="${py(t)}" x2="${M.w - M.r}" y2="${py(t)}" stroke="var(--grid)" stroke-width="1"/>`;
+      s += `<line x1="${px(t)}" y1="${M.t}" x2="${px(t)}" y2="${M.h - M.b}" stroke="var(--grid)" stroke-width="1"/>`;
+    });
+
+    // quadrant split
+    s += `<line x1="${px(5)}" y1="${M.t}" x2="${px(5)}" y2="${M.h - M.b}" stroke="var(--baseline)" stroke-width="1" stroke-dasharray="5 4"/>`;
+    s += `<line x1="${M.l}" y1="${py(5)}" x2="${M.w - M.r}" y2="${py(5)}" stroke="var(--baseline)" stroke-width="1" stroke-dasharray="5 4"/>`;
+
+    // quadrant captions
+    s += `<text class="quad-txt" x="${px(0.25)}" y="${py(9.6)}">Built, not yet sold</text>`;
+    s += `<text class="quad-txt" x="${M.w - M.r - 6}" y="${py(9.6)}" text-anchor="end">Scaled and shipping</text>`;
+    s += `<text class="quad-txt" x="${px(0.25)}" y="${py(0.35)}">Early on both</text>`;
+    s += `<text class="quad-txt" x="${M.w - M.r - 6}" y="${py(0.35)}" text-anchor="end">Selling ahead of the stack</text>`;
+
+    // axes
+    s += `<line x1="${M.l}" y1="${M.h - M.b}" x2="${M.w - M.r}" y2="${M.h - M.b}" stroke="var(--baseline)" stroke-width="1.5"/>`;
+    s += `<line x1="${M.l}" y1="${M.t}" x2="${M.l}" y2="${M.h - M.b}" stroke="var(--baseline)" stroke-width="1.5"/>`;
+    ticks.forEach(t => {
+      s += `<text class="axis-txt" x="${px(t)}" y="${M.h - M.b + 19}" text-anchor="middle">${t}</text>`;
+      s += `<text class="axis-txt" x="${M.l - 11}" y="${py(t) + 4}" text-anchor="end">${t}</text>`;
+    });
+    s += `<text class="axis-title" x="${(M.l + M.w - M.r) / 2}" y="${M.h - 14}" text-anchor="middle">Commercial traction →</text>`;
+    s += `<text class="axis-title" transform="translate(20,${(M.t + M.h - M.b) / 2}) rotate(-90)" text-anchor="middle">Technology buildout →</text>`;
+
+    // Augustus reference cross
+    const ax = px(AUG.traction), ay = py(AUG.tech);
+    s += `<line x1="${M.l}" y1="${ay}" x2="${ax}" y2="${ay}" stroke="var(--accent)" stroke-width="1" stroke-dasharray="3 4" opacity="0.7"/>`;
+    s += `<line x1="${ax}" y1="${M.h - M.b}" x2="${ax}" y2="${ay}" stroke="var(--accent)" stroke-width="1" stroke-dasharray="3 4" opacity="0.7"/>`;
+
+    // marks
+    rows.forEach(d => {
+      const x = px(d.traction), y = py(d.tech);
+      const isSel = d.id === state.sel;
+      s += `<g class="mark${isSel ? " sel" : ""}" data-id="${d.id}" tabindex="0" role="button"
+              aria-label="${esc(d.name)}: traction ${fmt(d.traction)}, buildout ${fmt(d.tech)}, overlap ${fmt(d.overlap)}">
+              ${markSVG(GROUPS[d.group].shape, x, y, 7.5, tierColor(tier(d.overlap)))}</g>`;
+    });
+
+    // Augustus mark
+    s += `<g class="mark" data-id="__aug" tabindex="0" role="button"
+            aria-label="Augustus baseline: traction 4.0, buildout 7.0">
+            ${markSVG("diamond", ax, ay, 8)}</g>`;
+    s += `<text class="pt-label" x="${ax + 16}" y="${ay - 8}" fill="var(--accent-ink)">Augustus</text>`;
+
+    // selective direct labels: high overlap, the three named incumbents, and the selection
+    const alwaysLabel = new Set(["openreserve", "lorum", "column", "anchorage", "jpm", "citi", "stanchart"]);
+    rows.filter(d => alwaysLabel.has(d.id) || d.id === state.sel).forEach(d => {
+      const lb = d.label || { dx: 14, dy: 4, anchor: "start" };
+      s += `<text class="pt-label" x="${px(d.traction) + lb.dx}" y="${py(d.tech) + lb.dy}"
+              text-anchor="${lb.anchor}">${esc(d.name.split(" ·")[0])}</text>`;
+    });
+
+    svg.innerHTML = s;
+
+    svg.querySelectorAll(".mark").forEach(g => {
+      const id = g.dataset.id;
+      if (id === "__aug") {
+        g.addEventListener("mouseenter", e => showTip(e,
+          `<div class="t-name">Augustus</div><div class="t-row">Traction 4.0 · Buildout 7.0</div>
+           <div style="margin-top:5px">Live euro clearing; USD charter conditionally approved May 2026.</div>`));
+      } else {
+        const d = DATA.find(x => x.id === id);
+        g.addEventListener("mouseenter", e => showTip(e,
+          `<div class="t-name">${esc(d.name)}</div>
+           <div class="t-row">Traction ${fmt(d.traction)} · Buildout ${fmt(d.tech)} · Overlap ${fmt(d.overlap)}</div>
+           <div style="margin-top:5px">${esc(d.one)}</div>`));
+        g.addEventListener("click", () => select(id));
+        g.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(id); } });
+      }
+      g.addEventListener("mousemove", moveTip);
+      g.addEventListener("mouseleave", hideTip);
+      g.addEventListener("blur", hideTip);
+    });
+  }
+
+  /* ------------------------------------------------------------------ bars */
+  function renderBars() {
+    const rows = visible().slice().sort((a, b) => b.overlap - a.overlap);
+    document.getElementById("bars").innerHTML = rows.map(d => {
+      const t = tier(d.overlap);
+      return `<div class="bar-row" data-id="${d.id}" role="button" tabindex="0"
+                aria-label="${esc(d.name)} overlap ${fmt(d.overlap)} of 10">
+        <span class="bar-name">${esc(d.name)}</span>
+        <span class="bar-track"><span class="bar-fill" style="width:${d.overlap * 10}%;background:${tierColor(t)}"></span></span>
+        <span class="bar-val">${fmt(d.overlap)}</span>
+      </div>`;
+    }).join("");
+
+    document.querySelectorAll(".bar-row").forEach(r => {
+      const d = DATA.find(x => x.id === r.dataset.id);
+      r.addEventListener("click", () => select(d.id));
+      r.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(d.id); } });
+      r.addEventListener("mouseenter", e => showTip(e,
+        `<div class="t-name">${esc(d.name)}</div>
+         <div class="t-row">Overlap ${fmt(d.overlap)} / 10 · ${TIER_LABEL[tier(d.overlap)]}</div>
+         <div style="margin-top:5px">${esc(d.overlapEv.slice(0, 190))}…</div>`));
+      r.addEventListener("mousemove", moveTip);
+      r.addEventListener("mouseleave", hideTip);
+    });
+  }
+
+  /* ----------------------------------------------------------------- table */
+  function renderTable() {
+    const rows = visible().slice().sort((a, b) => {
+      const k = state.sortKey;
+      const av = a[k], bv = b[k];
+      const c = typeof av === "string" ? av.localeCompare(bv) : av - bv;
+      return c * state.sortDir;
+    });
+
+    document.getElementById("tbody").innerHTML = rows.map(d => {
+      const t = tier(d.overlap);
+      return `<tr data-id="${d.id}" class="${d.id === state.sel ? "sel" : ""}" tabindex="0">
+        <td class="name">${esc(d.name)}</td>
+        <td><span class="pill pill-grp">${esc(GROUPS[d.group].label)}</span></td>
+        <td>${esc(d.charter)}</td>
+        <td><span class="cell-score"><span class="mini-track"><span class="mini-fill" style="width:${d.traction * 10}%"></span></span><span class="num">${fmt(d.traction)}</span></span></td>
+        <td><span class="cell-score"><span class="mini-track"><span class="mini-fill" style="width:${d.tech * 10}%"></span></span><span class="num">${fmt(d.tech)}</span></span></td>
+        <td><span class="pill pill-${t}">${fmt(d.overlap)} ${t}</span></td>
+        <td>${esc(d.one)}</td>
+      </tr>`;
+    }).join("");
+
+    document.getElementById("tbl-count").textContent =
+      `Showing ${rows.length} of ${DATA.length} rivals. Augustus baseline: traction 4.0, buildout 7.0.`;
+
+    document.querySelectorAll("#tbody tr").forEach(tr => {
+      tr.addEventListener("click", () => select(tr.dataset.id));
+      tr.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); select(tr.dataset.id); } });
+    });
+
+    document.querySelectorAll("#tbl th.sortable").forEach(th => {
+      const k = th.dataset.k;
+      const active = state.sortKey === k;
+      th.setAttribute("aria-sort", active ? (state.sortDir === 1 ? "ascending" : "descending") : "none");
+      const base = th.textContent.replace(/\s*[▲▼]$/, "");
+      th.innerHTML = esc(base) + (active ? ` <span class="arrow">${state.sortDir === 1 ? "▲" : "▼"}</span>` : "");
+    });
+  }
+
+  function wireSort() {
+    document.querySelectorAll("#tbl th.sortable").forEach(th => {
+      th.addEventListener("click", () => {
+        const k = th.dataset.k;
+        if (state.sortKey === k) state.sortDir *= -1;
+        else { state.sortKey = k; state.sortDir = (k === "name" || k === "group") ? 1 : -1; }
+        renderTable();
+      });
+    });
+  }
+
+  /* --------------------------------------------------------------- dossier */
+  function renderDossier() {
+    const d = DATA.find(x => x.id === state.sel) || DATA[0];
+    const t = tier(d.overlap);
+    const srcs = d.sources.length
+      ? d.sources.map(s => `<a href="${s.u}" target="_blank" rel="noopener">${esc(s.l)}</a>`).join("")
+      : `<span class="src-int">Internal only — Tiger expert calls and customer tracker</span>`;
+
+    document.getElementById("dossier").innerHTML = `
+      <div class="dos-head">
+        <span class="eyebrow">Dossier</span>
+        <span class="dos-name">${esc(d.name)}</span>
+        <div class="dos-meta">
+          <span class="pill pill-grp">${esc(GROUPS[d.group].label)}</span>
+          <span class="pill pill-${t}">${TIER_LABEL[t]} ${fmt(d.overlap)}</span>
+          <span class="pill pill-cov-${d.coverage}" title="Depth of Tiger's own files on this rival">Internal file: ${COV_LABEL[d.coverage]}</span>
+        </div>
+      </div>
+
+      <div class="dos-scores">
+        <div class="dos-score"><span class="v mono">${fmt(d.traction)}</span><span class="k">Traction</span></div>
+        <div class="dos-score"><span class="v mono">${fmt(d.tech)}</span><span class="k">Buildout</span></div>
+        <div class="dos-score"><span class="v mono">${fmt(d.overlap)}</span><span class="k">Overlap</span></div>
+      </div>
+
+      <div class="dos-block"><span class="k">Charter &amp; licence</span><span class="v">${esc(d.charter)}</span></div>
+      <div class="dos-block"><span class="k">Commercial traction</span><span class="v">${esc(d.tractionEv)}</span></div>
+      <div class="dos-block"><span class="k">Technology buildout</span><span class="v">${esc(d.techEv)}</span></div>
+      <div class="dos-block"><span class="k">Overlap with Augustus</span><span class="v">${esc(d.overlapEv)}</span></div>
+      <div class="dos-verdict"><strong>So what:</strong> ${esc(d.verdict)}</div>
+      <div class="dos-block"><span class="k">Sources</span><div class="src-list">${srcs}</div></div>
+    `;
+  }
+
+  function select(id) {
+    state.sel = id;
+    renderMatrix();
+    renderTable();
+    renderDossier();
+  }
+
+  /* --------------------------------------------------------------- tooltip */
+  const tip = document.getElementById("tip");
+  function showTip(e, html) { tip.innerHTML = html; tip.hidden = false; moveTip(e); }
+  function moveTip(e) {
+    const pad = 14, w = tip.offsetWidth, h = tip.offsetHeight;
+    let x = e.clientX + pad, y = e.clientY + pad;
+    if (x + w > window.innerWidth - 8) x = e.clientX - w - pad;
+    if (y + h > window.innerHeight - 8) y = e.clientY - h - pad;
+    tip.style.left = Math.max(8, x) + "px";
+    tip.style.top = Math.max(8, y) + "px";
+  }
+  function hideTip() { tip.hidden = true; }
+
+  /* ------------------------------------------------------------------ boot */
+  function renderAll() { renderMatrix(); renderBars(); renderTable(); renderDossier(); }
+
+  buildChips();
+  wireSort();
+  renderAll();
+
+  let rt;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(renderMatrix, 140); });
+  const mq = window.matchMedia("(prefers-color-scheme: dark)");
+  if (mq.addEventListener) mq.addEventListener("change", renderAll);
+})();
+</script>
