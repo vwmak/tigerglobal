@@ -4,7 +4,17 @@ Procedure for the weekly Routine that keeps the Augustus competitive landscape
 dashboard current. Each firing starts a fresh session, so this file is the
 memory: read it first, follow it, and improve it when you learn something.
 
-**Live artifact:** https://claude.ai/code/artifact/9d2bf9d0-bcfb-4bcc-968f-6ead3bcb24f0
+## The three outputs
+
+Every refresh updates all three. They are the same content in different places,
+and leaving one stale is the main way this goes wrong.
+
+| Output | Where | Note |
+|---|---|---|
+| Live artifact | https://claude.ai/code/artifact/9d2bf9d0-bcfb-4bcc-968f-6ead3bcb24f0 | Republish to this URL so the shared link never changes |
+| Egnyte copy | `/Shared/Research/02. Private Companies/01. Portfolio Companies/Augustus/07. Competitors/augustuscompetitivelandscape.html` | This is `Y:\02. Private Companies\…` on the mapped drive — `Y:` is `/Shared/Research` |
+| Repo | dated branch + draft PR in `vwmak/tigerglobal` | The reviewable diff |
+
 **Source:** `augustus-competitive-landscape.html` (artifact fragment — no doctype/head)
 **Standalone:** `augustus-competitive-landscape-standalone.html` (generated, never hand-edited)
 **Build:** `python3 build-standalone.py augustus-competitive-landscape.html`
@@ -56,11 +66,23 @@ files, not a public-data judgement.
 5. **Publish** to the existing artifact URL, so the shared link keeps working:
    `action: "read"` it first (a publish to an artifact the session has not read
    is refused), then publish with `url` set and `favicon` omitted.
-6. **Commit on a dated branch** off the default branch —
+6. **Upload the standalone build to Egnyte**, to the exact path in the table
+   above, with `mcp__Egnyte__upload_file`. Two things matter here:
+   - Use the **standalone** file, never the artifact fragment. The fragment has
+     no doctype or `<head>` and will not render correctly opened off a drive.
+   - Keep the filename **exactly** `augustuscompetitivelandscape.html` (no
+     separators — that is how it was first saved). Uploading to the same path
+     adds a new **version**; changing the name creates a duplicate and the team
+     loses version history. Do not move older copies into `_Archive` — Egnyte
+     versioning already keeps them.
+   If the Egnyte tools are not attached to the session, say so in the report and
+   deliver the file with `SendUserFile` so it can be dropped in by hand. Never
+   report the Egnyte copy as updated when it was not.
+7. **Commit on a dated branch** off the default branch —
    `claude/augustus-landscape-refresh-YYYY-MM-DD` — and open a **draft** PR.
    Do not push to `claude/correspondent-banking-competitors-78tsyr`; that branch
    belongs to the original PR and may already be merged.
-7. **Report only what changed.** If a week produced nothing material, say that
+8. **Report only what changed.** If a week produced nothing material, say that
    in one line and stop. A refresh with no findings is a valid outcome; padding
    it is not.
 
