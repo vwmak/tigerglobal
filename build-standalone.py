@@ -6,7 +6,7 @@ doctype, <head> and a small reset at publish time, so the source must not
 carry them itself. This script adds that scaffolding so the same content
 opens correctly as a plain file, over file:// or any static host.
 
-Usage: python3 build-standalone.py clearing-competitors.html
+Usage: python3 build-standalone.py augustus-competitive-landscape.html
 Writes: <name>-standalone.html
 """
 import re
