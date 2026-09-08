@@ -215,9 +215,22 @@
     padding: 10px 12px; font-size: 13.5px; color: var(--ink);
   }
 
+  /* key metrics */
+  .mx {
+    display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: 1px; background: var(--border); border: 1px solid var(--border);
+  }
+  .mx-k, .mx-v { background: var(--surface-2); padding: 6px 9px; line-height: 1.4; }
+  .mx-k {
+    font-family: "IBM Plex Mono", monospace; font-size: 9.5px; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--muted); padding-top: 8px;
+  }
+  .mx-v { font-size: 12.5px; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .pos { font-size: 13.5px; color: var(--ink-2); border-left: 2px solid var(--border-firm); padding-left: 11px; line-height: 1.5; }
+
   /* news items */
   .news { display: flex; flex-direction: column; gap: 8px; }
-  .ni { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 9px; align-items: start; }
+  .ni { display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 9px; align-items: start; }
   .ni-date { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; color: var(--muted); padding-top: 2px; white-space: nowrap; }
   .ni-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
   .ni-head { font-size: 13px; color: var(--ink); line-height: 1.4; }
@@ -284,7 +297,7 @@
   /* newsflow */
   .flow { display: flex; flex-direction: column; }
   .flow-row {
-    display: grid; grid-template-columns: 58px 150px minmax(0, 1fr);
+    display: grid; grid-template-columns: 80px 150px minmax(0, 1fr);
     gap: 12px; align-items: start; padding: 10px 0;
     border-bottom: 1px solid var(--grid); cursor: pointer;
   }
@@ -298,7 +311,7 @@
   .flow-head a:hover { color: var(--accent-ink); border-color: var(--accent); }
   .flow-why { font-size: 12.5px; color: var(--ink-2); }
   @media (max-width: 720px) {
-    .flow-row { grid-template-columns: 52px minmax(0, 1fr); }
+    .flow-row { grid-template-columns: 80px minmax(0, 1fr); }
     .flow-who { grid-column: 2; }
     .flow-what { grid-column: 2; }
   }
@@ -798,9 +811,9 @@
     },
     {
       id: "lead", name: "Lead Bank", group: "challenger", coverage: "partial",
-      traction: 6.0, tech: 6.0, overlap: 5,
+      traction: 6.0, tech: 6.0, overlap: 5.5,
       charter: "US state-chartered bank; crypto-friendly sponsor",
-      one: "A credible sponsor bank that keeps losing the head-to-heads to Column.",
+      one: "Loses the head-to-heads to Column — but is now one of two banks settling VisaNet obligations in USDC.",
       tractionEv: "Live sponsor banking for fintech and crypto clients, including a 2025 stablecoin card partnership with Stripe and Visa. It appears in the RFPs Augustus's prospects run but places behind Column on API quality and clearing speed.",
       techEv: "Modern sponsor stack with batch-hours settlement rather than continuous clearing — the limitation Tiger's brief calls out for the Lead and Column cohort.",
       overlapEv: "Competes for fintech sponsorship, not foreign FI dollar clearing. Overlaps on the domestic leg only.",
@@ -812,9 +825,9 @@
     },
     {
       id: "crossriver", name: "Cross River", group: "challenger", coverage: "partial",
-      traction: 6.5, tech: 5.5, overlap: 4,
+      traction: 6.5, tech: 5.5, overlap: 5,
       charter: "US state-chartered bank; sponsor and lending",
-      one: "Scaled sponsor bank, thin international bench.",
+      one: "Thin international bench, but Visa picked it as a US stablecoin settlement leg.",
       tractionEv: "An established sponsor and lending franchise with a large fintech base. Prospects in Tiger's tracker marked it down for fewer international bank relationships and no commitment to rail timelines.",
       techEv: "Capable stack oriented to domestic ACH, card and lending rather than cross-border settlement.",
       overlapEv: "Mostly a different business — it contests the US sponsorship leg, not cross-border clearing for non-US institutions.",
@@ -938,6 +951,268 @@
       sources: []
     }
   ];
+
+  /* Key metrics, kept out of the entries so both stay readable.
+     Incumbents lead on tokenized-rail volume and clearing KPIs; the private
+     companies lead on capital, ownership and unit economics. */
+  const METRICS = {
+    jpm: {
+      pos: "The scale incumbent. Owns the USD clearing franchise outright and has the only bank tokenization platform operating at real volume — but sells it to its own clients, not to the market.",
+      rows: [
+        ["Tokenized rail volume", "~$7bn/day (Apr 2026); >$3tn cumulative"],
+        ["Tokenized growth", "Payments ~10x YoY"],
+        ["Total USD clearing", "~$10tn/day; ~30% of USD SWIFT traffic"],
+        ["Clearing revenue", "~$20bn"],
+        ["Rail footprint", "JPMD live on Base; phasing onto Canton"],
+        ["Named corporates", "Siemens, BlackRock, BMW, Mitsubishi, FirstRand, B2C2"]
+      ]
+    },
+    citi: {
+      pos: "The network incumbent. Widest cross-border clearing footprint in banking, and now the first to sell 24/7 tokenized USD clearing to a foreign bank rather than only inside its own branches.",
+      rows: [
+        ["Tokenized rail", "Token Services live NY–London–HK; deposit token on Base"],
+        ["Tokenized milestone", "24/7 USD clearing live with Siam Commercial Bank (Jul 2026)"],
+        ["Interoperability", "Live transactions on Swift's Ledger with FAB and OCBC (Sep 2026)"],
+        ["Total USD clearing", "$5–6tn/day"],
+        ["Clearing revenue", "~$18bn"],
+        ["Segment ROTCE", "27%+ — Citi's highest"],
+        ["Network", "270+ clearing memberships, 94 countries; >70% of Services revenue ex-US"]
+      ]
+    },
+    stanchart: {
+      pos: "The emerging-market incumbent, and the one whose corridors overlap Augustus's almost exactly. Productised tokenized deposits at real volume without building a public-chain rail.",
+      rows: [
+        ["Tokenized deposits", "~$11bn/month (Morgan Stanley, Jul 2026)"],
+        ["Primary use case", "Cross-border e-CNY settlement"],
+        ["Tokenized milestone", "First live interbank tokenized deposit on Swift's ledger, with HSBC"],
+        ["Clearing revenue", "~$5bn"],
+        ["Footprint", "120 currencies, ~54 markets"],
+        ["Stablecoin", "Anchorpoint HKD issuance phased from Q2 2026; USDC mint/redeem for institutions"]
+      ]
+    },
+    hsbc: {
+      pos: "The Asia trade incumbent. No proprietary token rail and no apparent intention to build one — it rented Swift's and reached cross-institution settlement first anyway.",
+      rows: [
+        ["Tokenized rail", "None proprietary"],
+        ["Tokenized milestone", "First live cross-border interbank tokenized deposit on Swift's ledger, with StanChart"],
+        ["Total USD clearing", "$1–2tn/day"],
+        ["Annual payment value", "~$600tn across 130+ currencies"],
+        ["Clearing revenue", "~$12bn"],
+        ["Ecosystem", "1,000+ fintech partnerships"]
+      ]
+    },
+    bny: {
+      pos: "Custody-led and adjacent. Competes for securities and asset-servicing mandates, not FI payment flow — but sits inside both bank consortia, so it shapes the standards.",
+      rows: [
+        ["Tokenized rail", "Stablecoin rails with Standard Chartered; global digital transfer agency (Jul 2026)"],
+        ["Clearing revenue", "~$880m excluding securities"],
+        ["Consortium role", "Founding partner of both the TCH network and Open USD"],
+        ["Franchise", "Custody and asset servicing, many multiples of clearing revenue"]
+      ]
+    },
+    db: {
+      pos: "An incumbent being displaced rather than a technology rival. Chose to help build someone else's network instead of its own, and its enforcement history is part of why terminated corridors are available.",
+      rows: [
+        ["Tokenized rail", "None proprietary — design partner on Circle Payments Network"],
+        ["Share of major-bank pool", "~4% of the $236bn cash-management and trade pool"],
+        ["Corridor role", "Still the majority USD clearer for several EM banks Augustus has pitched"],
+        ["Quarter's announcements", "ADR depositary mandates only"]
+      ]
+    },
+    tch: {
+      pos: "Not a company — the incumbents' collective standard. Makes 24/7 programmable USD settlement an expectation for anyone banking with a member, and nothing at all for those who cannot.",
+      rows: [
+        ["Members", "17 banks — JPMorgan, Citi, BofA, Wells Fargo, BNY, HSBC, TD, U.S. Bank"],
+        ["Live volume", "None — launch targeted H1 2027"],
+        ["Rail integration", "Linked to RTP and CHIPS"],
+        ["Adjacent effort", "Separate 21-bank shared dollar stablecoin company, launch 1H27, euro next"]
+      ]
+    },
+    openusd: {
+      pos: "An economic argument dressed as a product: reserve income belongs to whoever holds the customer. If it sticks, every stablecoin-adjacent P&L — Augustus's included — gets repriced.",
+      rows: [
+        ["Partners", "140+ companies"],
+        ["Founding names", "Stripe, Coinbase, Mastercard, Visa, BlackRock, BNY, StanChart, Anchorage, Ripple"],
+        ["Live volume", "Not disclosed"],
+        ["Launched", "30 June 2026"],
+        ["Economics", "Fee-free mint and redeem; reserve income to distributors net of a management fee"],
+        ["Market reaction", "Circle fell >12%, its worst day in four months"],
+        ["Leadership", "Zach Abrams, Bridge co-founder, interim CEO"]
+      ]
+    },
+
+    column: {
+      pos: "The benchmark private comparable and the closest architectural match: a modern core on a charter it owns. Its base is still US fintechs and its push is lending, which is the only reason the EM clearing lane is still open.",
+      rows: [
+        ["Valuation", "No external round; ~$6bn offers reportedly declined"],
+        ["Capital raised", "$0 external · $50m paid-in capital"],
+        ["Ownership", "William Hockey ~90%; employees on stock appreciation rights"],
+        ["Revenue", "$291m annualised (Sacra, Jun 2026) vs ~$500m in Tiger research"],
+        ["Growth", "+114% YoY public read; ~2x internal read"],
+        ["Deposits · NIM", "$1.2bn · 9.6% vs ~3% industry"],
+        ["Profitability", ">$100m FCF, ~85% gross margin"],
+        ["Corridor win", "Uzum Bank, Uzbekistan — won on compliance speed"]
+      ]
+    },
+    erebor: {
+      pos: "A deposit-gathering franchise for AI, defence and crypto, priced like a software company. Wins on onboarding speed and yield; the product depth behind the pitch is contested by its own customers.",
+      rows: [
+        ["Valuation", "~$9.5bn in talks (Aug 2026) · $4bn Dec 2025 · $2bn May 2025"],
+        ["Round in market", "~$1.5bn"],
+        ["Capital raised", "$625m committed · $575m paid-in · opened with $635m"],
+        ["Investors", "Palmer Luckey (lead), Peter Thiel, Lux Capital, Human Capital, Valor Equity, a16z, SV Angel"],
+        ["Deposits", "$4.6bn end-Jul 2026, from $1.1bn in Mar"],
+        ["Revenue", "~$112m annualised (Jul 2026) — an 85x multiple on the raise"],
+        ["Products", "Fiat and stablecoin deposits, crypto- and GPU/TPU-backed lending, BaaS, treasury"],
+        ["Customer read", "Tools for Humanity 10/10 on USDC off-ramp; Kraken cites execution issues"]
+      ]
+    },
+    openreserve: {
+      pos: "A clean-sheet attempt at exactly Augustus's product — tokenized deposits, foreign correspondent banking, institutional BaaS and a stablecoin subsidiary — aimed at settlement while the Fed is closed. Two to three years behind on execution.",
+      rows: [
+        ["Valuation", "Not disclosed"],
+        ["Capital raised", "$25m seed (Apr 2026)"],
+        ["Investors", "a16z crypto (lead), Jump, Acrew, Coinbase Ventures, Clocktower, Quona, AAF"],
+        ["Capital gate", "$210m paid-in and 12% Tier 1 within 12 months, or approval lapses"],
+        ["Live volume", "Pre-operational"],
+        ["Founders", "Dee Choubey (MoneyLion founder) and ex-MoneyLion team"],
+        ["Charter", "OCC preliminary conditional approval, Utah; FDIC pending"]
+      ]
+    },
+    lorum: {
+      pos: "A payments-only bank by design: clearing, custody and treasury with no lending and no balance-sheet risk. It reaches Augustus's customer on a fraction of the capital, and gives up settlement finality to do it.",
+      rows: [
+        ["Valuation", "Not disclosed"],
+        ["Capital raised", "~$8.6m, including a $6.6m seed"],
+        ["Investors", "Northzone, Flourish Ventures, Illuminate Financial, Raba, Shorooq Partners"],
+        ["Founded", "2023 — George Davis (BVNK co-founder, CEO), James Smith (CTO)"],
+        ["Board", "George Rzepecki (Raba), Georges Makhoul (ex-Morgan Stanley MENA), Penny Turnbridge (ex-UBS COO)"],
+        ["Charter", "Lorum National Trust Bank, N.A. filed with the OCC 31 Mar 2026"],
+        ["Model", "Named-account custody to cut nesting risk; USD and tokenized-asset clearing; explicitly no lending"],
+        ["Customers", "European FIs, small and mid-market US banks, payroll operators, PSPs"]
+      ]
+    },
+    anchorage: {
+      pos: "The regulated crypto-native bank turned correspondent-banking substitute. Sells the nostro replacement Augustus sells, a year earlier, but on a trust charter that cannot hold transaction deposits or extend credit.",
+      rows: [
+        ["Valuation", "$4.2bn (Feb 2026), from $3bn in 2021"],
+        ["Capital raised", "$587m across 6 rounds from 53 investors"],
+        ["Investors", "a16z, KKR, Goldman Sachs, Visa, Blockchain Capital; Tether led $100m in Feb 2026"],
+        ["Product launch", "Stablecoin Solutions for Banks, 19 Feb 2026; tokenized deposit platform, Jun 2026"],
+        ["Pipeline", "Up to 20 large firms looking to issue"],
+        ["Tokens serviced", "Tether USA₮, Ethena USDtb, OSL USDGO, Western Union USDPT (forthcoming)"],
+        ["Charter", "First OCC-chartered digital-asset bank (trust)"]
+      ]
+    },
+    revolut: {
+      pos: "Consumer and SMB scale pointed at cross-border retail flow, not institutional clearing. It outsources stablecoin issuance, which says it does not intend to own the settlement layer.",
+      rows: [
+        ["Valuation", "$75bn (Nov 2025 secondary) · ~$115bn secondary sought 2H26 · $200bn IPO target"],
+        ["Capital raised", "$1.99bn across 13 rounds from 148 investors"],
+        ["Investors", "Coatue, Greenoaks, Dragoneer, a16z, NVIDIA's venture arm"],
+        ["Customers", "~75m globally"],
+        ["Charter", "OCC preliminary conditional approval, Connecticut"],
+        ["Digital-asset plan", "Custody, stablecoin cross-border transfers, Revolut-branded stablecoin issued by a third party"]
+      ]
+    },
+    lead: {
+      pos: "A programmable-banking platform for fintechs that has quietly become critical infrastructure: one of two banks settling Visa's US stablecoin obligations. Competes for the domestic leg, not the cross-border one.",
+      rows: [
+        ["Valuation", "$1.47bn post-money"],
+        ["Capital raised", "$70m Series B"],
+        ["Investors", "ICONIQ and Greycroft (new); Ribbit, Coatue, Khosla, a16z, Zeev"],
+        ["Network role", "One of two partner banks settling VisaNet obligations in USDC over Solana"],
+        ["Settlement model", "Batch-hours rather than continuous clearing"],
+        ["Bake-off record", "Placed behind Column on API quality and clearing speed in Tiger's tracker"]
+      ]
+    },
+    crossriver: {
+      pos: "A scaled sponsor-and-lending bank whose relevance here is the Visa settlement mandate, not cross-border reach — prospects marked it down for having too few international bank relationships.",
+      rows: [
+        ["Valuation", "~$3bn+ ($50m round in 2026); >$3bn at the 2022 round"],
+        ["Capital raised", "~$670m, including $620m in Mar 2022"],
+        ["Investors", "a16z and Eldridge Industries (2022 lead investors)"],
+        ["Network role", "Partner bank for Visa's US USDC settlement over Solana"],
+        ["Orientation", "Domestic ACH, card and lending"],
+        ["Prospect objection", "Fewer international banks; no commitment to rail timelines"]
+      ]
+    },
+
+    circle: {
+      pos: "Issuer turned network. The dollar token with the regulatory perimeter, now building the routing layer and the chain beneath it — but a trust charter means it can never be the clearing counterparty of record.",
+      rows: [
+        ["Market cap", "~$22–26bn (CRCL)"],
+        ["USDC circulation", "$73.3bn in 2Q26, +19% YoY"],
+        ["Revenue", "$701m in 2Q26, +7% YoY"],
+        ["Margin", "41.2% revenue less distribution cost, +3pts YoY"],
+        ["On-chain volume", "$163bn/day average in 2Q26, +151% YoY; ~$15tn total"],
+        ["CPN volume", "$23bn annualised (late Jul 2026), 6.8x YoY, 70% MoM"],
+        ["Charters", "OCC national trust and NYDFS trust, both Jul 2026"],
+        ["Design partners", "Santander, Deutsche Bank, SocGen, Standard Chartered"]
+      ]
+    },
+    ripple: {
+      pos: "The original correspondent-banking replacement, now buying its way into the regulated perimeter. Sells a network and a token to banks; Augustus sells the account itself.",
+      rows: [
+        ["Valuation", "$50bn (Mar 2026 employee buyback), from $40bn in Nov 2025"],
+        ["Capital raised", "$500m strategic round Nov 2025, including Citadel Securities and Fortress"],
+        ["RLUSD", ">$1.6bn supply; $18.4bn transfer volume in 1Q26"],
+        ["Network", "300+ institutions across 55+ countries"],
+        ["Licences", "75+ globally, including a NYDFS trust charter"],
+        ["Cumulative ODL", ">$95bn"]
+      ]
+    },
+    bridge: {
+      pos: "The orchestration layer with the best distribution in the category, and — through Open Standard — now a hand on the economics of the dollar token itself. Cannot be a settlement counterparty.",
+      rows: [
+        ["Acquisition", "$1.1bn by Stripe"],
+        ["Distribution", "The stablecoin layer inside Stripe's merchant and platform base"],
+        ["Consortium role", "Co-founder Zach Abrams is interim CEO of Open Standard, issuer of Open USD"],
+        ["Regulated leg", "Dependent on partner banks"],
+        ["Internal coverage", "No dedicated Tiger file"]
+      ]
+    },
+    bvnk: {
+      pos: "Proven cross-border stablecoin volume now carrying Mastercard's scheme distribution. Competes for the flow, not the clearing relationship — and its alumni built Lorum.",
+      rows: [
+        ["Acquisition", "$1.5bn plus up to $300m earnout; completed 3 Aug 2026"],
+        ["Volume", "~$30bn a year in stablecoin payments"],
+        ["Footprint", "130 markets on 25+ licences"],
+        ["Clients", "Worldpay, Deel, Rapyd, Flywire"],
+        ["Significance", "First big listed network to buy stablecoin infrastructure outright rather than partner in"],
+        ["Alumni", "Founders went on to build Lorum"]
+      ]
+    },
+    visa: {
+      pos: "A settlement network extending into stablecoin issuance and management. It does not want to be a bank — it wants chartered banks like Cross River and Lead to be its settlement legs.",
+      rows: [
+        ["Market cap", "~$700bn (V)"],
+        ["Stablecoin settlement", "$20bn annualised run rate (Sep 2026), from $7bn in Apr and $3.5bn in Nov 2025"],
+        ["Stablecoin card volume", "+200% YoY"],
+        ["Settlement partners", "Cross River and Lead Bank settle VisaNet obligations in USDC over Solana"],
+        ["Reach", "Visa Direct ~18bn endpoints"],
+        ["2026 launches", "Stablecoin minting and management platform; Brale institutional settlement pilot; onchain lending"]
+      ]
+    },
+    coinbase: {
+      pos: "The venue and the chain the rest of the field runs on — including JPMorgan's and Citi's deposit tokens. Competes for a different wallet than Augustus entirely.",
+      rows: [
+        ["Market cap", "~$49bn (COIN)"],
+        ["USDC on platform", "$20bn all-time high in 2Q26 — >30% of USDC in circulation"],
+        ["Reserve economics", "~50% of USDC reserve economics"],
+        ["Base volume", "~$32tn stablecoin transfer volume over the trailing year"],
+        ["Agentic share", ">90% of on-chain agentic stablecoin transactions"],
+        ["Trading", "Third consecutive quarter of record market share in 2Q26"],
+        ["Charter", "OCC conditional national trust charter, Apr 2026"]
+      ]
+    }
+  };
+
+  DATA.forEach(d => {
+    const m = METRICS[d.id];
+    d.metrics = m ? m.rows : [];
+    d.positioning = m ? m.pos : "";
+  });
 
   /* ------------------------------------------------------- scales & helpers */
   const tier = v => (v >= 7.5 ? "high" : v >= 5 ? "mid" : "low");
@@ -1240,6 +1515,11 @@
         <div class="dos-score"><span class="v mono">${fmt(d.tech)}</span><span class="k">Buildout</span></div>
         <div class="dos-score"><span class="v mono">${fmt(d.overlap)}</span><span class="k">Overlap</span></div>
       </div>
+      ${d.metrics.length ? `<div class="dos-block"><span class="k">Key metrics</span>
+        <div class="mx">${d.metrics.map(r =>
+          `<span class="mx-k">${esc(r[0])}</span><span class="mx-v">${esc(r[1])}</span>`).join("")}</div></div>` : ""}
+      ${d.positioning ? `<div class="dos-block"><span class="k">Market positioning</span>
+        <span class="pos">${esc(d.positioning)}</span></div>` : ""}
       <div class="dos-block"><span class="k">Latest headlines</span>${newsHTML}</div>
       <div class="dos-block"><span class="k">Charter status</span><span class="v">${esc(d.charter)}</span></div>
       <div class="dos-block"><span class="k">Commercial traction</span><span class="v">${esc(d.tractionEv)}</span></div>
