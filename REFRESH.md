@@ -22,6 +22,15 @@ Three layers:
 3. **Deployment.** Commit + push the edited HTML to the branch; whatever serves it
    (GitHub Pages / static host) then serves the fresh copy, which the open page
    auto-reloads into.
+4. **Egnyte sync.** The dashboard is also saved for the Augustus deal team at
+   `Private Companies > Portfolio Companies > Augustus > Bank Charter Pipeline`
+   in Egnyte (full path:
+   `/Shared/Private Companies/Portfolio Companies/Augustus/Bank Charter Pipeline/bank-charter-pipeline.html`).
+   After committing and pushing, upload the refreshed `bank-charter-pipeline.html`
+   to that same Egnyte path, overwriting the existing file, so the copy the deal
+   team opens stays current. This requires the Egnyte connector to be enabled for
+   the session running the refresh — if its tools aren't available, note that in
+   the run summary instead of silently skipping the upload.
 
 ## How to refresh (manual or scheduled)
 
@@ -33,7 +42,14 @@ Ask Claude Code (or run the scheduled job) with roughly this instruction:
 > Utah ILC). For each company update status (Pending / Conditionally Approved /
 > Final Approval), regulator, key date, sector and notes. Add newly reported
 > applicants; move companies whose status changed. Then set `LAST_UPDATED` to
-> today, keep the `CHARTERS` schema identical, commit and push.
+> today, keep the `CHARTERS` schema identical, commit and push. Finally, upload the
+> refreshed `bank-charter-pipeline.html` to Egnyte at
+> `/Shared/Private Companies/Portfolio Companies/Augustus/Bank Charter Pipeline/bank-charter-pipeline.html`,
+> overwriting the existing file, so the deal-team copy stays current.
+
+This runs **weekly**. If nothing in the underlying facts changed, still bump
+`LAST_UPDATED` to today, commit, push, and re-upload to Egnyte so the "data as of"
+date stays current there too.
 
 Primary sources to check each run:
 - OCC news releases & "Chartering, Organization and Structure" corporate decisions
