@@ -294,28 +294,6 @@
   .mini-fill { display: block; height: 100%; background: var(--ink-2); border-radius: 0 3px 3px 0; }
   .num { font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; }
 
-  /* newsflow */
-  .flow { display: flex; flex-direction: column; }
-  .flow-row {
-    display: grid; grid-template-columns: 80px 150px minmax(0, 1fr);
-    gap: 12px; align-items: start; padding: 10px 0;
-    border-bottom: 1px solid var(--grid); cursor: pointer;
-  }
-  .flow-row:last-child { border-bottom: 0; }
-  .flow-row:hover { background: var(--accent-wash); }
-  .flow-date { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--muted); white-space: nowrap; }
-  .flow-who { font-size: 12.5px; font-weight: 600; color: var(--ink); overflow: hidden; text-overflow: ellipsis; }
-  .flow-what { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-  .flow-head { font-size: 13.5px; color: var(--ink); line-height: 1.4; }
-  .flow-head a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--border-firm); }
-  .flow-head a:hover { color: var(--accent-ink); border-color: var(--accent); }
-  .flow-why { font-size: 12.5px; color: var(--ink-2); }
-  @media (max-width: 720px) {
-    .flow-row { grid-template-columns: 80px minmax(0, 1fr); }
-    .flow-who { grid-column: 2; }
-    .flow-what { grid-column: 2; }
-  }
-
   .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(248px, 1fr)); gap: 16px; }
   .card { display: flex; flex-direction: column; gap: 5px; padding-left: 13px; border-left: 2px solid var(--accent); }
   .card .when { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; letter-spacing: 0.06em; color: var(--accent-ink); }
@@ -386,10 +364,10 @@
           </div>
           <div class="legend-set">
             <span class="lg-lab">Type</span>
-            <span class="lg"><svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><rect x="2.5" y="2.5" width="10" height="10" rx="1.5" fill="var(--ink-2)"/></svg>Incumbent</span>
-            <span class="lg"><svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><circle cx="7.5" cy="7.5" r="5.5" fill="var(--ink-2)"/></svg>Chartered challenger</span>
-            <span class="lg"><svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><polygon points="7.5,1.8 13.4,12.6 1.6,12.6" fill="var(--ink-2)"/></svg>Network &amp; infra</span>
-            <span class="lg"><svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><polygon points="7.5,1.2 13.8,7.5 7.5,13.8 1.2,7.5" fill="var(--ink)" stroke="var(--accent)" stroke-width="2"/></svg>Augustus</span>
+            <span class="lg"><svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><rect x="2.7" y="2.7" width="9.6" height="9.6" rx="1.5" fill="var(--ink-2)"/></svg>Incumbent</span>
+            <span class="lg"><svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><circle cx="7.5" cy="7.5" r="4.8" fill="var(--ink-2)"/></svg>Chartered challenger</span>
+            <span class="lg"><svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><polygon points="7.5,2.7 12.3,12.3 2.7,12.3" fill="var(--ink-2)"/></svg>Network &amp; infra</span>
+            <span class="lg"><svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><polygon points="7.5,2.7 12.3,7.5 7.5,12.3 2.7,7.5" fill="var(--ink)" stroke="var(--accent)" stroke-width="2"/></svg>Augustus</span>
           </div>
         </div>
         <p class="tiny" style="margin-top:9px">Scores are Tiger's read of the cited evidence, not
@@ -398,16 +376,6 @@
 
       <aside class="dossier" id="dossier" aria-live="polite" aria-label="Competitor dossier"></aside>
     </div>
-  </section>
-
-  <section class="panel" aria-labelledby="flow-h">
-    <div class="panel-head">
-      <h2 id="flow-h">Newsflow — what moved in the last quarter</h2>
-      <p class="note">Most consequential items across the set, newest first, filtered by the
-        controls above. Every headline links to its source.</p>
-    </div>
-    <div class="flow" id="flow"></div>
-    <p class="tiny" id="flow-count"></p>
   </section>
 
   <section class="panel" aria-labelledby="ov-h">
@@ -481,39 +449,6 @@
           all cleared OCC approval inside eight months, alongside Augustus's own conditional
           approval in May. The scarce charter anchoring the moat is getting less scarce — though
           full-service charters with deposit powers remain in single digits.</span>
-      </div>
-    </div>
-  </section>
-
-  <section class="panel" aria-labelledby="cav-h">
-    <div class="panel-head">
-      <h2 id="cav-h">Four things the field said against the thesis</h2>
-      <p class="note">From Tiger's own expert and customer calls.</p>
-    </div>
-    <div class="cards">
-      <div class="card">
-        <span class="when">Kraken · expert call</span>
-        <span class="what">Instant settlement needs a closed loop</span>
-        <span class="so">Both counterparties must bank with Augustus. Until it holds both sides of
-          a corridor, the product is a faster correspondent, not a replacement.</span>
-      </div>
-      <div class="card">
-        <span class="when">Kraken · expert call</span>
-        <span class="what">Stablecoin settlement is "not game-changing"</span>
-        <span class="so">At current cost structures the stablecoin leg was called interesting, not
-          decisive. What wins is compliance speed and always-on access.</span>
-      </div>
-      <div class="card">
-        <span class="when">Fed policy · in flight</span>
-        <span class="what">Skinny master accounts and FedNow</span>
-        <span class="so">Both could compress the USD-clearing edge. FedNow settled volume went
-          from $2bn in 2Q24 to $1.09tn in 1Q26 — still under 10bps of Fedwire.</span>
-      </div>
-      <div class="card">
-        <span class="when">Multiple calls</span>
-        <span class="what">Complement, not replacement</span>
-        <span class="so">Customers want the US entity to mature with Tier 1 clients first. That
-          caps near-term wallet share whatever rivals do.</span>
       </div>
     </div>
   </section>
@@ -628,7 +563,7 @@
       id: "stanchart", name: "Standard Chartered", group: "incumbent", coverage: "deep",
       traction: 7.0, tech: 6.5, overlap: 7.5,
       charter: "UK bank; Anchorpoint HKMA stablecoin issuer licence",
-      label: { dx: 14, dy: 5, anchor: "start" },
+      label: { dx: -14, dy: 5, anchor: "end" },
       one: "Running ~$11bn/month of tokenized deposits and first to settle a live interbank transaction on Swift's ledger — far ahead of where our deck put it.",
       tractionEv: "~$5bn clearing revenue across 120 currencies and ~54 emerging markets. Institutional clients can now mint and redeem USDC through the bank; Zodia Custody was fully absorbed; in September it became the first top global bank to offer BTC and ETH trading in the UAE.",
       techEv: "Tiger's deck recorded its tokenized posture as one line — “poached the JPM Kinexys head” — with no productized platform. Sell-side has since overtaken that: Morgan Stanley puts tokenized deposits at ~$11bn per month, largely cross-border e-CNY settlement, and HSBC's research desk credits StanChart and HSBC with the first live cross-border interbank transaction on Swift's blockchain ledger. Plus stablecoin rails with BNY, Anchorpoint's phased HKD issuance, and Open USD founding membership.",
@@ -1208,10 +1143,75 @@
     }
   };
 
+
+  /* Charter detail for the chartered challengers: instrument, how far through
+     approval it actually is, and the dates. A conditional approval is not a
+     charter — several of these cannot legally open yet. */
+  const CHARTERS = {
+    column: [
+      ["Instrument", "National bank charter (OCC) — full-service, FDIC-insured"],
+      ["Approval stage", "Full and operating"],
+      ["How obtained", "Acquired, not de novo — bought Northern California National Bank, Chico CA, renamed Column N.A."],
+      ["Date", "2021, funded with ~$50m of the founders' own capital"],
+      ["Fed access", "Direct Fed connectivity"]
+    ],
+    erebor: [
+      ["Instrument", "National bank charter (OCC) — full-service, FDIC-insured"],
+      ["Approval stage", "Full and operating"],
+      ["Preliminary conditional", "15 Oct 2025"],
+      ["FDIC insurance", "16 Dec 2025"],
+      ["Final charter", "Early Feb 2026 — opened 9 Feb 2026"],
+      ["Note", "First de novo national bank charter approved in four years"]
+    ],
+    openreserve: [
+      ["Instrument", "Full-service insured national bank (OCC), with a stablecoin-issuing subsidiary planned"],
+      ["Approval stage", "Preliminary conditional only — cannot open yet"],
+      ["Date received", "3 Sep 2026 (Utah)"],
+      ["Still outstanding", "FDIC deposit insurance; $210m paid-in capital and a 12% Tier 1 leverage ratio within 12 months or the approval lapses"]
+    ],
+    lorum: [
+      ["Instrument", "National trust bank (OCC) — Lorum National Trust Bank, N.A.; no lending powers sought"],
+      ["Approval stage", "None — application pending"],
+      ["Filed", "31 Mar 2026, from 115 Broadway, New York"],
+      ["Operating licence today", "Dubai-regulated entity; the specific licence is not disclosed in the coverage we hold"],
+      ["Why it matters", "A trust charter would let it apply for a Federal Reserve account and end its partner-bank dependency"]
+    ],
+    anchorage: [
+      ["Instrument", "National trust bank (OCC), non-depository — Anchorage Digital Bank, N.A."],
+      ["Approval stage", "Conditional approval, operating since 2021"],
+      ["Date received", "13 Jan 2021 — conversion from a South Dakota trust charter held since 2019"],
+      ["Powers excluded", "Non-depository: cannot hold transaction deposits or extend credit"],
+      ["Note", "First federally chartered digital-asset bank"]
+    ],
+    revolut: [
+      ["Instrument", "Full-service insured national bank (OCC) — Revolut Bank US, N.A., branchless, Stamford CT"],
+      ["Approval stage", "Preliminary conditional only — cannot open yet"],
+      ["Date received", "3 Sep 2026 — OCC Corporate Decision #1390, signed 2 Sep"],
+      ["Application filed", "10 Mar 2026, de novo"],
+      ["Still outstanding", "FDIC deposit insurance and Federal Reserve approval; four services need separate sign-off"],
+      ["Target opening", "1H 2027 — serves US customers through Lead Bank until then"]
+    ],
+    lead: [
+      ["Instrument", "Missouri state-chartered bank, FDIC-insured"],
+      ["Approval stage", "Full and operating"],
+      ["How obtained", "Acquired — $56m purchase by Luna Parent"],
+      ["Date", "Aug 2022"],
+      ["Supervisor", "Federal Reserve Bank of Kansas City"],
+      ["Note", "Revolut's current US sponsor bank"]
+    ],
+    crossriver: [
+      ["Instrument", "New Jersey state-chartered bank, FDIC-insured"],
+      ["Approval stage", "Full and operating"],
+      ["Date", "Founded 2008, Fort Lee NJ"],
+      ["Note", "No OCC charter sought — positions itself as a technology company holding a bank charter"]
+    ]
+  };
+
   DATA.forEach(d => {
     const m = METRICS[d.id];
     d.metrics = m ? m.rows : [];
     d.positioning = m ? m.pos : "";
+    d.charterRows = CHARTERS[d.id] || [];
   });
 
   /* ------------------------------------------------------- scales & helpers */
@@ -1222,26 +1222,6 @@
   const tierColor = t => cssVar(t === "high" ? "--ov-high" : t === "mid" ? "--ov-mid" : "--ov-low");
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const fmt = v => v.toFixed(1);
-
-  /* Newsflow: the items worth a cross-set feed, newest first. `why` is the read. */
-  const FLOW = [
-    { id: "circle",      k: 0, why: "Buys corridor distribution in exactly Augustus's Southeast Asia target." },
-    { id: "tch",         k: 1, why: "17 banks now, wired straight into RTP and CHIPS." },
-    { id: "visa",        k: 2, why: "The network layer keeps widening under everyone's feet." },
-    { id: "openreserve", k: 0, why: "The highest-overlap rival is now legally cleared to build." },
-    { id: "revolut",     k: 0, why: "Two charters in one week — the moat is thinning." },
-    { id: "citi",        k: 1, why: "Multi-bank interoperability via Swift, not a Citi-only garden." },
-    { id: "hsbc",        k: 0, why: "The incumbent shortcut to cross-institution settlement: rent Swift's ledger." },
-    { id: "erebor",      k: 0, why: "Sets the private-bank comp Augustus gets priced against." },
-    { id: "bvnk",        k: 0, why: "Closed — Mastercard now owns a $30bn-a-year stablecoin rail." },
-    { id: "circle",      k: 4, why: "Sell-side turning: tokenized deposits dilute the case for stablecoins." },
-    { id: "stanchart",   k: 2, why: "~$11bn a month of tokenized deposits, on Augustus's corridors." },
-    { id: "citi",        k: 0, why: "Citi delivered Augustus's pitch to a foreign bank, live." },
-    { id: "openusd",     k: 0, why: "140 partners routing reserve income away from the issuer." },
-    { id: "bridge",      k: 0, why: "A Stripe alum now sets the dollar token's economics." },
-    { id: "column",      k: 0, why: "Public revenue read still well below Tiger's internal figure." },
-    { id: "anchorage",   k: 2, why: "Tokenized deposits for banks, from a trust charter." }
-  ];
 
   const state = { arch: "all", ov: "all", sel: "citi", sortKey: "overlap", sortDir: -1 };
 
@@ -1286,8 +1266,9 @@
     const st = `fill="${fill}" stroke="var(--surface)" stroke-width="2" class="mk"`;
     if (shape === "square") return `<rect x="${x - r}" y="${y - r}" width="${2 * r}" height="${2 * r}" rx="2" ${st}/>`;
     if (shape === "triangle") {
-      const h = r * 1.28;
-      return `<polygon points="${x},${y - h} ${x + h * 1.02},${y + h * 0.72} ${x - h * 1.02},${y + h * 0.72}" ${st}/>`;
+      // inscribed in the same 2r box as the square and circle, so the legend
+      // glyphs and the plotted marks read at one weight
+      return `<polygon points="${x},${y - r} ${x + r * 1.02},${y + r * 0.8} ${x - r * 1.02},${y + r * 0.8}" ${st}/>`;
     }
     if (shape === "diamond") {
       const d = r * 1.34;
@@ -1405,40 +1386,6 @@
     </div>`;
   }
 
-  function renderFlow() {
-    const vis = new Set(visible().map(d => d.id));
-    const rows = FLOW.filter(f => vis.has(f.id)).map(f => {
-      const d = byId(f.id);
-      return { d, n: d.news[f.k], why: f.why };
-    }).filter(r => r.n);
-
-    document.getElementById("flow").innerHTML = rows.map(r => {
-      const head = r.n.u
-        ? `<a href="${r.n.u}" target="_blank" rel="noopener">${esc(r.n.h)}</a>`
-        : esc(r.n.h);
-      return `<div class="flow-row" data-id="${r.d.id}" role="button" tabindex="0"
-                aria-label="${esc(r.d.name)}: ${esc(r.n.h)}">
-        <span class="flow-date">${esc(r.n.d)}</span>
-        <span class="flow-who">${esc(r.d.name)}</span>
-        <span class="flow-what">
-          <span class="flow-head">${head}</span>
-          <span class="flow-why">${esc(r.why)}</span>
-          <span class="ni-src"><span class="tchip t-${r.n.t}">${esc(TYPE_LABEL[r.n.t] || r.n.t)}</span><span class="ni-pub">${esc(r.n.p)}</span></span>
-        </span>
-      </div>`;
-    }).join("");
-
-    document.getElementById("flow-count").textContent =
-      `${rows.length} items shown. Every competitor's full headline set is in its dossier.`;
-
-    document.querySelectorAll(".flow-row").forEach(r => {
-      r.addEventListener("click", ev => {
-        if (ev.target.tagName !== "A") select(r.dataset.id);
-      });
-      r.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); select(r.dataset.id); } });
-    });
-  }
-
   /* ----------------------------------------------------------------- table */
   function renderTable() {
     const rows = visible().slice().sort((a, b) => {
@@ -1521,7 +1468,11 @@
       ${d.positioning ? `<div class="dos-block"><span class="k">Market positioning</span>
         <span class="pos">${esc(d.positioning)}</span></div>` : ""}
       <div class="dos-block"><span class="k">Latest headlines</span>${newsHTML}</div>
-      <div class="dos-block"><span class="k">Charter status</span><span class="v">${esc(d.charter)}</span></div>
+      ${d.charterRows.length
+        ? `<div class="dos-block"><span class="k">Charter detail</span>
+            <div class="mx">${d.charterRows.map(r =>
+              `<span class="mx-k">${esc(r[0])}</span><span class="mx-v">${esc(r[1])}</span>`).join("")}</div></div>`
+        : `<div class="dos-block"><span class="k">Charter status</span><span class="v">${esc(d.charter)}</span></div>`}
       <div class="dos-block"><span class="k">Commercial traction</span><span class="v">${esc(d.tractionEv)}</span></div>
       <div class="dos-block"><span class="k">Technology buildout</span><span class="v">${esc(d.techEv)}</span></div>
       <div class="dos-block"><span class="k">Overlap with Augustus</span><span class="v">${esc(d.overlapEv)}</span></div>
@@ -1552,7 +1503,7 @@
   function hideTip() { tip.hidden = true; }
 
   /* ------------------------------------------------------------------ boot */
-  function renderAll() { renderMatrix(); renderFlow(); renderBars(); renderTable(); renderDossier(); }
+  function renderAll() { renderMatrix(); renderBars(); renderTable(); renderDossier(); }
 
   buildChips();
   wireSort();
