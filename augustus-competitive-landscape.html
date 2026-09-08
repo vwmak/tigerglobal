@@ -164,7 +164,8 @@
   }
   @media (max-width: 980px) { .matrix-wrap { grid-template-columns: 1fr; } }
 
-  svg { display: block; width: 100%; height: auto; overflow: visible; }
+  #matrix { display: block; width: 100%; height: auto; overflow: visible; }
+  .lg svg { flex: none; width: 15px; height: 15px; display: block; }
   .axis-txt { font-family: "IBM Plex Mono", monospace; font-size: 11px; fill: var(--muted); }
   .axis-title { font-family: "IBM Plex Sans", sans-serif; font-size: 12px; font-weight: 600; fill: var(--ink-2); letter-spacing: 0.02em; }
   .quad-txt { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; fill: var(--muted); letter-spacing: 0.07em; text-transform: uppercase; }
@@ -352,10 +353,10 @@
           </div>
           <div class="legend-set">
             <span class="lg-lab">Type</span>
-            <span class="lg"><svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><rect x="2.7" y="2.7" width="9.6" height="9.6" rx="1.5" fill="var(--ink-2)"/></svg>Incumbent</span>
-            <span class="lg"><svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><circle cx="7.5" cy="7.5" r="4.8" fill="var(--ink-2)"/></svg>Chartered challenger</span>
-            <span class="lg"><svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><polygon points="7.5,2.7 12.3,12.3 2.7,12.3" fill="var(--ink-2)"/></svg>Network &amp; infra</span>
-            <span class="lg"><svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><polygon points="7.5,2.7 12.3,7.5 7.5,12.3 2.7,7.5" fill="var(--ink)" stroke="var(--accent)" stroke-width="2"/></svg>Augustus</span>
+            <span class="lg"><svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><rect x="3.34" y="3.34" width="8.33" height="8.33" rx="1.2" fill="var(--ink-2)"/></svg>Incumbent</span>
+            <span class="lg"><svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><circle cx="7.5" cy="7.5" r="4.65" fill="var(--ink-2)"/></svg>Chartered challenger</span>
+            <span class="lg"><svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><polygon points="7.5,2.41 13.38,12.59 1.62,12.59" fill="var(--ink-2)"/></svg>Network &amp; infra</span>
+            <span class="lg"><svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><polygon points="7.5,3.2 11.8,7.5 7.5,11.8 3.2,7.5" fill="var(--ink)" stroke="var(--accent)" stroke-width="1"/></svg>Augustus</span>
           </div>
         </div>
         <p class="tiny" style="margin-top:9px">Scores are Tiger's read of the cited evidence, not
@@ -667,7 +668,7 @@
       id: "openreserve", name: "OpenReserve", group: "challenger", coverage: "none",
       traction: 1.5, tech: 3.0, overlap: 9,
       charter: "OCC preliminary conditional approval, Sep 2026 (Utah); FDIC pending",
-      label: { dx: 16, dy: 4, anchor: "start" },
+      label: { dx: 6, dy: -14, anchor: "start" },
       one: "The closest positional match on the board — Augustus's thesis, three years behind, and zero internal coverage.",
       tractionEv: "Pre-operational. Founded 2025 by MoneyLion founder Dee Choubey; $25m seed led by a16z crypto in April 2026 with Jump, Acrew, Coinbase Ventures, Clocktower and Quona. It has twelve months to raise $210m of paid-in capital at a 12% Tier 1 leverage ratio or the approval lapses.",
       techEv: "A blockchain-native core in build, branchless. Nothing in production; the charter took under five months but capital is the binding constraint.",
@@ -1250,17 +1251,26 @@
   const px = v => M.l + (v / 10) * (M.w - M.l - M.r);
   const py = v => M.h - M.b - (v / 10) * (M.h - M.t - M.b);
 
+  /* Marks are sized for equal ink, not equal bounding box: a square that fills
+     its box reads far heavier than a triangle inscribed in the same box. These
+     ratios are relative to r, the circle radius, and were solved by rasterising
+     each glyph and counting opaque pixels. The triangle carries a 0.88x
+     correction because it still reads wide at true equal area. */
+  const SQ = 0.8945, TRI_W = 1.2634, TRI_H = 1.0948, DIA = 0.9239;
+
   function markSVG(shape, x, y, r, fill) {
     const st = `fill="${fill}" stroke="var(--surface)" stroke-width="2" class="mk"`;
-    if (shape === "square") return `<rect x="${x - r}" y="${y - r}" width="${2 * r}" height="${2 * r}" rx="2" ${st}/>`;
+    if (shape === "square") {
+      const h = r * SQ;
+      return `<rect x="${x - h}" y="${y - h}" width="${2 * h}" height="${2 * h}" rx="2" ${st}/>`;
+    }
     if (shape === "triangle") {
-      // inscribed in the same 2r box as the square and circle, so the legend
-      // glyphs and the plotted marks read at one weight
-      return `<polygon points="${x},${y - r} ${x + r * 1.02},${y + r * 0.8} ${x - r * 1.02},${y + r * 0.8}" ${st}/>`;
+      const w = r * TRI_W, h = r * TRI_H;
+      return `<polygon points="${x},${y - h} ${x + w},${y + h} ${x - w},${y + h}" ${st}/>`;
     }
     if (shape === "diamond") {
-      const d = r * 1.34;
-      return `<polygon points="${x},${y - d} ${x + d},${y} ${x},${y + d} ${x - d},${y}" fill="var(--ink)" stroke="var(--accent)" stroke-width="2.5" class="mk"/>`;
+      const d = r * DIA;
+      return `<polygon points="${x},${y - d} ${x + d},${y} ${x},${y + d} ${x - d},${y}" fill="var(--ink)" stroke="var(--accent)" stroke-width="2" class="mk"/>`;
     }
     return `<circle cx="${x}" cy="${y}" r="${r}" ${st}/>`;
   }
