@@ -78,10 +78,22 @@ files, not a public-data judgement.
    If the Egnyte tools are not attached to the session, say so in the report and
    deliver the file with `SendUserFile` so it can be dropped in by hand. Never
    report the Egnyte copy as updated when it was not.
-7. **Commit on a dated branch** off the default branch —
-   `claude/augustus-landscape-refresh-YYYY-MM-DD` — and open a **draft** PR.
-   Do not push to `claude/correspondent-banking-competitors-78tsyr`; that branch
-   belongs to the original PR and may already be merged.
+7. **Commit on a dated branch** named `claude/augustus-landscape-refresh-YYYY-MM-DD`
+   and open a **draft** PR. Pick the base carefully — this is the one thing that
+   has gone consistently wrong:
+   - Branch off **whichever ref already contains `augustus-competitive-landscape.html`**.
+     Check the default branch first; if the dashboard is not there yet, branch off
+     the newest existing `claude/augustus-landscape-refresh-*` branch instead, and
+     set that same branch as the PR's base.
+   - Branching off a base that lacks the dashboard makes the whole file read as
+     new, so the PR shows ~3,000 added lines instead of the week's actual delta
+     and nobody can review it. Between 21 Sep and 19 Oct every weekly PR was
+     unreviewable for exactly this reason: the original dashboard PR had not been
+     merged, so the default branch never gained the files.
+   - Never push to `claude/correspondent-banking-competitors-78tsyr`; that branch
+     belongs to the original PR.
+   If you find more than two open refresh PRs stacked up, say so in the report —
+   it means the earlier ones are not being merged and the chain needs attention.
 8. **Report only what changed.** If a week produced nothing material, say that
    in one line and stop. A refresh with no findings is a valid outcome; padding
    it is not.
