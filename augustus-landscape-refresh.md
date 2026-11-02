@@ -85,10 +85,20 @@ files, not a public-data judgement.
    If the Egnyte tools are not attached to the session, say so in the report and
    deliver the file with `SendUserFile` so it can be dropped in by hand. Never
    report the Egnyte copy as updated when it was not.
-7. **Commit on a dated branch** off the default branch —
-   `claude/augustus-landscape-refresh-YYYY-MM-DD` — and open a **draft** PR.
-   Do not push to `claude/correspondent-banking-competitors-78tsyr`; that branch
-   belongs to the original PR and may already be merged.
+7. **Commit on a dated branch** named `claude/augustus-landscape-refresh-YYYY-MM-DD`
+   and open a **draft** PR. Pick the base carefully — this is the one thing that
+   has gone consistently wrong:
+   - Branch off **whichever ref already contains `augustus-competitive-landscape.html`**.
+     Check the default branch first; if the dashboard is not there yet, branch off
+     the newest existing `claude/augustus-landscape-refresh-*` branch instead, and
+     set that same branch as the PR's base.
+   - Branching off a base that lacks the dashboard makes the whole file read as
+     new, so the PR shows ~3,000 added lines instead of the week's actual delta.
+   - Never push to `claude/correspondent-banking-competitors-78tsyr`; that branch
+     belongs to the original PR.
+   - If a session is handed a pre-named branch, reset it to that base
+     (`git checkout -B <branch> origin/<newest refresh branch>`) before editing.
+   If you find more than two open refresh PRs stacked up, say so in the report.
 8. **Report only what changed.** If a week produced nothing material, say that
    in one line and stop. A refresh with no findings is a valid outcome; padding
    it is not.
@@ -272,6 +282,32 @@ page's history was found by measurement and missed by looking.
   and priced in, so they went to news and metrics only. `ask_cortex` found only
   mention-level hits; WebSearch returned little dated after 5 Oct — AlphaSense
   `auto` mode was the productive source.
+
+- **Sandbox quirks (2 Nov).** Foreground `sleep` is blocked; run waits as
+  `sleep N` with `run_in_background`, or just poll the job tools between other
+  work. `ask_cortex` took ~5 min, AlphaSense `auto` ~3 min, `ask_third_party_research`
+  was still pending after 10+ minutes (51insights silent since 4 Sep).
+- **OpenReserve coverage moved none → partial (2 Nov).** Cortex surfaced
+  `.../Augustus/05. Market Data and Industry Analysis/Augustus_AI-Native_Bank_Comp_Set.html`
+  (28 Oct 2026): a desk-built comp set (PitchBook, OCC/FDIC decisions, press) on
+  Augustus, Erebor, OpenReserve, Lorum, Catena and Agora. Read it before touching
+  those entries. It corrects the seed to $24.0m closed 10 Jun at $72m post, and reads
+  OpenReserve as US-domestic / BaaS-led, which tensions with overlap 9 — held for a
+  human decision. Still no expert or customer call; the only corpus mention is a
+  9 Jul Kraken Bank call where the expert had not met the team.
+- **Possible additions awaiting a human call: Agora and Catena Labs.** Both won
+  OCC preliminary conditional *trust* charters on 18 Sep 2026 (CD #1393 / #1392,
+  $10m Tier 1). The comp set calls them adjacent — more likely customers or
+  partners than FI-clearing rivals — so they were not added.
+- **Verify "final approval" language against the OCC/company release.** Ripple's
+  26 Oct final approval is for a *trust* charter (no deposits, no loans): charter
+  field updated, scores held.
+- **Verify launch claims that come back from one research note.** AlphaSense
+  attributed HSBC RedCoin and Ripple's final approval to HSBC research notes;
+  both checked out on public sources, but only after a WebSearch.
+- **Quiet-week pattern (2 Nov):** JPMD on Ethereum mainnet (19 Oct), Citi x Arab Bank
+  (21 Oct), OCC GENIUS final rule (21 Oct, effective 18 Jan 2027), HSBC RedCoin retail
+  (23 Oct), Visa $25bn annualised stablecoin settlement (29 Oct). No scores moved.
 
 ## Watchlist — the dated risks
 
