@@ -309,6 +309,20 @@ page's history was found by measurement and missed by looking.
   (21 Oct), OCC GENIUS final rule (21 Oct, effective 18 Jan 2027), HSBC RedCoin retail
   (23 Oct), Visa $25bn annualised stablecoin settlement (29 Oct). No scores moved.
 
+- **Egnyte upload pitfalls (2 Nov).** `upload_file` writes a new version immediately, so
+  never call it with placeholder content "to test" — it becomes the version the team
+  opens. The `get_upload_url` + curl route fails in the sandbox (egress proxy refuses
+  `tigerglobal.egnyte.com`), so the only route is `upload_file` with the full file inline
+  (139KB is fine). Verify with `list_filesystem_by_path`: the `size` and `checksum`
+  (sha512) must equal `wc -c` / `sha512sum` of the standalone. `get_file_content` strips
+  HTML tags and is useless for verifying.
+- **Third-party corpus (2 Nov).** 51insights silent since 4 Sep; Fintech Brainfood is not
+  in the corpus at all; Artemis posted nothing relevant. Payments in Full, Fintech Business
+  Weekly and Fintech Blueprint carried the charter / tokenized-deposit thread. Nothing in
+  the window on Swift ledger, Column, Lorum or OpenReserve.
+- **Artifact publish needs a view first.** The first publish is refused and returns a diff
+  against live; resend the same content in a second call and it goes through.
+
 ## Watchlist — the dated risks
 
 | What | When | Why it matters |
