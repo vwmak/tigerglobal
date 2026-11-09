@@ -311,19 +311,13 @@
 
   <header class="masthead">
     <div class="masthead-row">
-      <span class="eyebrow">Tiger Global · Portfolio diligence · 2 Nov 2026</span>
+      <span class="eyebrow">Tiger Global · Portfolio diligence · 9 Nov 2026</span>
       <span class="subject-tag">Augustus · Series B · $180M @ $1B</span>
     </div>
     <h1>Augustus Competitive Landscape</h1>
     <p class="lede">Twenty-three institutions are building some version of always-on dollar
       settlement; six are selling Augustus's actual product — a chartered balance sheet that
-      lets a foreign bank clear USD without a correspondent chain. No scores moved this week.
-      Ripple won final OCC approval for its national trust bank, but a trust charter takes no
-      deposits and makes no loans, so it still sits outside the clearing balance sheet. Citi took
-      24/7 USD clearing to Arab Bank and the MENA corridor, JPMorgan put its deposit token on
-      Ethereum mainnet, and HSBC switched its Hong Kong stablecoin on for retail. The OCC also
-      finalised its GENIUS Act issuer rule. Each extends a rail the board already prices in, and
-      the overlap read is unchanged. Click any competitor for its scores, evidence and headlines.</p>
+      lets a foreign bank clear USD without a correspondent chain. No scores moved this week. Coinbase took final OCC approval for its national trust bank, the third trust charter to go final in four months after Circle and Ripple — custody-scoped, no deposits, no lending, no direct stablecoin issuance, so it sits outside the clearing balance sheet. SBI put $100m into Erebor, which has passed $7bn of deposits. Circle reported Q3 revenue of $865m with average USDC in circulation of $73bn. Last week's Citi, JPMorgan and HSBC moves are unchanged and already priced in. Click any competitor for its scores, evidence and headlines.</p>
   </header>
 
   <section class="panel" aria-labelledby="matrix-h">
@@ -709,6 +703,7 @@
       overlapEv: "Its charter application covers international companies seeking USD rails including foreign correspondent relationships, but the live wedge is US innovation-economy deposits and lending yield, not foreign FI clearing.",
       verdict: "Compete on delivery, not charter. Its underperforming clients are a rip-and-replace list — and its $9.5bn mark is the comp Augustus's next round gets priced against.",
       news: [
+        { d: "4 Nov 2026", t: "press", p: "SBI Holdings", h: "SBI Holdings USA invests $100m in Erebor Bank", u: "https://research.alpha-sense.com?docid=MTN-fe1ec04f29cccf316ee0db10eae84c0e108f14d4&scope=ANYWHERE&stmt=fse449&hl=fse449&page=1" },
         { d: "6 Oct 2026", t: "substack", p: "TBPN", h: "Erebor passes $7B in deposits eight months after launch — 500+ customers and $3B+ of deposits added in the quarter; roughly 90% of assets held as cash at other banks, ~$78M in loans", u: "" },
         { d: "15 Sep 2026", t: "news", p: "Yahoo Finance / Bitget", h: "Erebor tightens its free stablecoin-to-cash conversion terms after Wintermute and Galaxy Digital arbitraged the zero-fee onboarding offer", u: "https://finance.yahoo.com/markets/crypto/articles/erebor-bank-free-stablecoin-plan-001141295.html" },
         { d: "11 Aug 2026", t: "news", p: "CoinDesk / FT", h: "Crypto-friendly bank Erebor in talks for $1.5bn at a $9.5bn valuation, with Lux, Valor, a16z and SV Angel expected to commit", u: "https://www.coindesk.com/business/2026/08/11/crypto-friendly-bank-erebor-in-talks-to-raise-usd1-5-billion-at-usd9-5-billion-valuation-ft" },
@@ -828,6 +823,7 @@
       overlapEv: "CPN routes cross-border payments without correspondent banks, the same outcome Augustus sells, and reserve income overlaps Augustus's net-interest economics. But CPN needs a regulated institution on each end of a corridor; Augustus is trying to be that institution.",
       verdict: "Partner and competitor at once, and now visibly under pressure: Morgan Stanley and Mizuho both moved to the bearish side on Open USD and tokenized-deposit encroachment, while TD Cowen and Citi stayed constructive on CPN and Arc. OUSD going live on 2 Oct turns that bear case from a thesis into a competing product. Augustus can settle CPN corridors as the chartered leg — the risk is CPN plus a member bank becoming good enough that nobody needs a new clearing bank. A second-order flag: Circle's charter is a national trust charter, the instrument the ICBA's 2 Oct suit asks the court to curtail. No score move this week — the Volante tie-up is a pilot and the litigation is unresolved.",
       news: [
+        { d: "4 Nov 2026", t: "news", p: "BigGo Finance", h: "Circle Q3 2026: revenue $865m (+17% YoY), adjusted EBITDA $317m (+85%), average USDC in circulation $73.3bn (+8%)", u: "https://research.alpha-sense.com?docid=WEB-2d59ea8486a265c289575e21bca204c0&scope=ANYWHERE&stmt=fse127&hl=fse127&page=1" },
         { d: "28 Sep 2026", t: "press", p: "Circle", h: "Volante Technologies and Circle to advance USDC payment and settlement for financial institutions — USDC minting, redemption and wallet flows inside Volante's payments platform; evaluation and testing phase, not production", u: "https://research.alpha-sense.com?docid=GDS-6abab212f22df81a92cfad25&scope=ANYWHERE&stmt=fse858&hl=fse858&page=1" },
         { d: "23 Sep 2026", t: "news", p: "Investing.com", h: "Circle presents Arc's early traction at the Autonomous 2026 Future of Commerce Symposium — ~$1bn of value and ~$500k of fees in Arc's first public week", u: "https://www.investing.com/news/transcripts/circle-at-autonomous-2026-future-of-commerce-symposium-arc-launch-gains-93CH-4914297" },
         { d: "16 Sep 2026", t: "news", p: "X / Stablecoin Insider", h: "Circle opens Arc to the public, moving from a 100+-institution private mainnet to general availability", u: "https://x.com/stablecoininfo/status/2099809649666953499" },
@@ -911,13 +907,14 @@
     {
       id: "coinbase", name: "Coinbase", group: "network", coverage: "partial",
       traction: 9.0, tech: 7.0, overlap: 4,
-      charter: "OCC conditional national trust charter, Apr 2026",
+      charter: "OCC final national trust charter, Nov 2026 (conditional Apr 2026); custody-scoped",
       one: "The venue everyone else's tokens run on, competing for a different wallet.",
       tractionEv: "The largest US exchange and USDC's distribution partner. StoneX puts average USDC held in Coinbase products at an all-time-high $20bn in 2Q26 — over 30% of USDC in circulation and roughly half its reserve economics — while Base processed ~$32tn of stablecoin transfer volume over the trailing year and over 90% of on-chain agentic stablecoin transactions. Base hosts both JPMD and Citi's tokenized deposit. StoneX puts 2025 stablecoin revenue at $1.35bn, ~19% of total revenue.",
       techEv: "Strong custody and chain infrastructure; revenue remains volatile and trading-dependent, and the trust charter is custody-scoped.",
       overlapEv: "Little direct contest for institutional USD clearing. Its relevance is as the infrastructure the incumbents chose.",
       verdict: "Not a rival for the mandate — the reason the incumbents got to market faster than expected. The Citi collaboration turns out to have gone live in production rather than into design, and it is also now a named launch partner of OUSD — but in both cases Coinbase supplies distribution and the bank supplies the balance sheet and the settlement finality. Citi is the bank of record in the virtual-account and merchant-acceptance flows, so the capability accrues to Citi's overlap score, not Coinbase's: the overlap score holds at 4.",
       news: [
+        { d: "9 Nov 2026", t: "news", p: "crypto.news / Bloomberg", h: "Coinbase wins final OCC approval for its national trust bank, seven months after conditional sign-off — custody only: no retail deposits, conventional loans or direct stablecoin issuance; NYDFS custody business to migrate over three years", u: "https://research.alpha-sense.com?docid=WEB-e5b48f914dc58c9c87a46bcfe47bcc2c&scope=ANYWHERE&stmt=fse165&hl=fse165&page=1" },
         { d: "30 Oct 2026", t: "research", p: "StoneX", h: "3Q26 takeaways — average on-platform USDC balance a record ~$22bn (~30% of USDC supply) despite the quietest crypto tape in years; Needham notes Coinbase Developer Platform payments volume compounding ~160% a quarter since 4Q25, with Citi and PNC as customers", u: "https://research.alpha-sense.com?docid=ASR-TBCO-052784327ab07535f70b917053c4c65d&scope=ANYWHERE&stmt=fse4634&hl=fse4634&page=2" },
         { d: "16 Oct 2026", t: "research", p: "StoneX", h: "Coinbase and Marqeta expand collaboration so businesses can issue stablecoin-funded payment cards settled on Base; StoneX reiterates Buy ahead of 3Q26", u: "https://research.alpha-sense.com?docid=ASR-TBCO-5c299fec1082b55d3346c70e98bb41fd&scope=ANYWHERE&stmt=fse3979&hl=fse3979&page=2" },
         { d: "28 Sep 2026", t: "press", p: "Citi", h: "Citi and Coinbase expand collaboration — Coinbase Virtual Accounts built on Citi's Virtual Account Wallet with automatic fiat-to-stablecoin conversion; live in production, Citi as bank of record", u: "https://research.alpha-sense.com?docid=PR-b5d6da4c171caca6571c76b80b1795ffcc193a01&scope=ANYWHERE&stmt=fse4253&hl=fse4253&page=1" },
@@ -1226,7 +1223,7 @@
         ["Agentic share", ">90% of on-chain agentic stablecoin transactions"],
         ["Stablecoin revenue", "$1.35bn in 2025 — ~19% of total revenue (StoneX)"],
         ["Trading", "Third consecutive quarter of record market share in 2Q26"],
-        ["Charter", "OCC conditional national trust charter, Apr 2026"]
+        ["Charter", "OCC final national trust charter, early Nov 2026 (conditional Apr 2026) — no retail deposits, lending or direct stablecoin issuance; custody moves from NYDFS entity over three years"]
       ]
     }
   };

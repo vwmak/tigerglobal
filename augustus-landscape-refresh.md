@@ -323,6 +323,13 @@ page's history was found by measurement and missed by looking.
 - **Artifact publish needs a view first.** The first publish is refused and returns a diff
   against live; resend the same content in a second call and it goes through.
 
+- **9 Nov: branch base.** `main` still lacks the dashboard and the 2 Nov work lives on
+  `claude/determined-einstein-dquvwg` (not a `refresh-*` name), so 9 Nov branched off that.
+  Coinbase went final on its OCC trust charter (reported 9 Nov, custody-scoped); sources
+  disagree on the exact date, so the entry says "early Nov". `crypto.news` is not reachable
+  from WebFetch in the sandbox; AlphaSense carries its text. Tiger cortex found no Kredete
+  files in the window.
+
 ## Watchlist — the dated risks
 
 | What | When | Why it matters |
