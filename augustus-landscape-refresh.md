@@ -346,8 +346,10 @@ page's history was found by measurement and missed by looking.
   Revolut, HSBC, TCH). Fixed with `label` overrides: BVNK upper-right
   (`dx 12, dy -13, start`), HSBC and Revolut centred below (`dx 0, dy 24, middle`), TCH to
   the left. The bar-name column was widened from 150px to 172px so "Open USD · Open Standard"
-  stops ellipsising. A reusable verifier that does all of this lives in this run's notes:
-  click every `#tbody tr`, then intersect every `.pt-label` rect with the other labels and every `.mark` rect.
+  stops ellipsising. `verify-dashboard.js` in the repo runs every check in the
+  verification list: `node verify-dashboard.js $PWD/augustus-competitive-landscape-standalone.html`
+  prints PASS or FAIL. It clicks every `#tbody tr` and intersects every `.pt-label` rect with
+  the other labels and with every `.mark` rect.
 - **Re-score trigger pending a human call: JPMorgan overlap.** Kinexys went live interoperating
   with DBS Token Services via Partior (16 Nov), which partly meets the "opens to non-JPM
   institutions" trigger in the JPM verdict. Held at 6 because it is bank-to-bank
