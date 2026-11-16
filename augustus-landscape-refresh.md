@@ -330,13 +330,37 @@ page's history was found by measurement and missed by looking.
   from WebFetch in the sandbox; AlphaSense carries its text. Tiger cortex found no Kredete
   files in the window.
 
+- **16 Nov: base, sweep and layout.** Branched off `claude/augustus-landscape-refresh-2026-11-09`
+  (still the newest refresh branch; `main` still lacks the dashboard). Live artifact and that
+  branch's fragment were identical bar a trailing newline. Open refresh PRs are now #4–#10 —
+  seven stacked drafts, each based on the previous branch; a human needs to merge the chain.
+  AlphaSense `auto` returned in ~2 min and was again the productive source; cortex took ~6 min
+  and found nothing on-topic beyond a Revolut survey; `ask_third_party_research` finished in
+  ~4 min this time. WebSearch returned nothing dated November for the private names.
+- **AlphaSense reports a law-firm alert's date as the event date.** It listed the OCC GENIUS
+  final rule as 12 Nov (a Latham note); the rule itself issued 21 Oct (Bulletin 2026-50).
+  Check regulatory dates against the agency or several law-firm alerts.
+- **The label-collision check must cover selection-only labels.** Entries outside the
+  always-labelled set get a label only when selected. Clicking each row in turn and testing
+  the labels after each click turned up six collisions that had shipped for weeks (BVNK,
+  Revolut, HSBC, TCH). Fixed with `label` overrides: BVNK upper-right
+  (`dx 12, dy -13, start`), HSBC and Revolut centred below (`dx 0, dy 24, middle`), TCH to
+  the left. The bar-name column was widened from 150px to 172px so "Open USD · Open Standard"
+  stops ellipsising. A reusable verifier that does all of this lives in this run's notes:
+  click every `#tbody tr`, then intersect every `.pt-label` rect with the other labels and every `.mark` rect.
+- **Re-score trigger pending a human call: JPMorgan overlap.** Kinexys went live interoperating
+  with DBS Token Services via Partior (16 Nov), which partly meets the "opens to non-JPM
+  institutions" trigger in the JPM verdict. Held at 6 because it is bank-to-bank
+  interoperability for a shared corporate client (Ant International), not dollar clearing sold
+  to a foreign FI.
+
 ## Watchlist — the dated risks
 
 | What | When | Why it matters |
 |---|---|---|
 | TCH tokenized deposit network | H1 2027; tech partner (Quant) picked 24 Sep 2026 | Makes 24/7 USD settlement table stakes for anyone banking a member |
 | Cari Network production launch | targeted end of 2026 | Same threat as TCH, one tier down at the regional/community-bank level; now bank-funded ($32.5m, 2 Sep 2026) with 30+ member banks and a live pilot |
-| 21-bank shared dollar stablecoin | 1H 2027 | Same, for the stablecoin leg |
+| 21-bank shared dollar stablecoin (Project Faro) | 1H 2027; ~$270m committed 10 Nov 2026 | Same, for the stablecoin leg |
 | Swift shared ledger rollout | ongoing; live USD transfer 4 Oct 2026, 19+ banks expected by end-2026 across five currencies | Hands incumbents the multi-bank reach Augustus expected to own |
 | ICBA v. OCC (DDC) | filed 2 Oct 2026 | Seeks to void the Mar 2026 final rule and Interpretive Letter 1176 behind **national trust** charters for largely non-fiduciary firms. Hits Lorum (pending), Anchorage and Circle; does **not** reach the full-service charters held by Augustus, OpenReserve, Revolut, Erebor or Column. A win for the ICBA makes Augustus's charter scarcer; a loss entrenches the cheap route |
 | OpenReserve capital raise | by Sep 2027 (corrected — not 12 months from the Apr 2026 seed); targets opening by Mar 2028 | $210m paid-in and 12% Tier 1, or the charter approval lapses |
