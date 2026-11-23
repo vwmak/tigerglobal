@@ -62,6 +62,11 @@ files, not a public-data judgement.
      session, so `WebSearch` and `search_alphasense` carried the press-release
      sweep instead — check for it explicitly rather than assuming it's there.
    - `WebSearch` for the private companies, which the paid sources cover poorly.
+   - `mcp__Tiger-Research__ask_news` (licensed news feed, from 5 Oct 2026 onward) — added
+     23 Nov and the best substitute yet for the missing InsiderScore press-release sweep.
+     Run it in parallel with AlphaSense: on 23 Nov it caught Standard Bank × Kinexys, the
+     Custodia cert denial, DBS × Circle and MoonPay's charter filing, none of which
+     AlphaSense returned. Took ~4 min.
 2. **Update only what the evidence moves.** A new datapoint usually changes a
    metric row or adds a headline. Re-score only when something material shifts —
    a product going live, a charter stage changing, a funding round closing — and
@@ -356,6 +361,24 @@ page's history was found by measurement and missed by looking.
   interoperability for a shared corporate client (Ant International), not dollar clearing sold
   to a foreign FI.
 
+- **23 Nov: base, sweep and fixes.** Branched off `claude/augustus-landscape-refresh-2026-11-16`
+  (`main` still lacks the dashboard); live artifact and that branch's fragment identical bar a
+  trailing newline. Egnyte file was at 10 versions before upload. Sources reached: AlphaSense
+  (~3 min), `ask_news` (~4 min), `ask_third_party_research` (~4 min), `ask_cortex` (~5 min —
+  mostly found this dashboard itself plus one Erebor item in TomorrowX summit notes), WebSearch.
+  InsiderScore still unattached.
+- **Check the date on any volume figure from a commentary source.** AlphaSense surfaced "CPN
+  above $58bn annualised" from a Zacks piece; it is Circle's 30 Oct figure, while the 3Q26
+  quarter-end figure is $41.3bn. Both now shown. The board had carried July's $23bn as current
+  for three months — when a public company reports a quarter, refresh the metric rows that
+  quote its prior quarter, not just the news list.
+- **`verify-dashboard.js` now fails on label collisions.** Until 23 Nov it printed them but
+  only failed on errors, overflow, glyphs and clipping.
+- **Adjacent charters not added (23 Nov):** Payoneer (OCC preliminary conditional trust charter,
+  20 Nov; SMB cross-border stablecoin issuer), MoonPay (trust filing 17 Nov), OakNorth (first
+  foreign digital bank with a US national charter, via acquisition, 20 Nov). None sells FI USD
+  clearing; mentioned in the OCC card only.
+
 ## Watchlist — the dated risks
 
 | What | When | Why it matters |
@@ -367,4 +390,4 @@ page's history was found by measurement and missed by looking.
 | ICBA v. OCC (DDC) | filed 2 Oct 2026 | Seeks to void the Mar 2026 final rule and Interpretive Letter 1176 behind **national trust** charters for largely non-fiduciary firms. Hits Lorum (pending), Anchorage and Circle; does **not** reach the full-service charters held by Augustus, OpenReserve, Revolut, Erebor or Column. A win for the ICBA makes Augustus's charter scarcer; a loss entrenches the cheap route |
 | OpenReserve capital raise | by Sep 2027 (corrected — not 12 months from the Apr 2026 seed); targets opening by Mar 2028 | $210m paid-in and 12% Tier 1, or the charter approval lapses |
 | Revolut FDIC + Fed approvals | targeting 1H 2027 | Turns a conditional approval into a real bank |
-| Lorum OCC trust decision | filed 31 Mar 2026 | A Fed account would end its partner-bank dependency |
+| Lorum OCC trust decision | filed 31 Mar 2026 | A Fed account would end its partner-bank dependency — but SCOTUS left master accounts discretionary (Custodia cert denied 16 Nov 2026) |

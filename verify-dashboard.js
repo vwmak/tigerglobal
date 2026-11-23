@@ -37,7 +37,7 @@ const file = 'file://' + process.argv[2];
       if(!d.ok) bad.push(id); d.c.forEach(x=>coll.add(x));
     }
     console.log(scheme,w,JSON.stringify(r),'errs',errs.length,errs[0]||'','badDossier',bad,'collisions',[...coll]);
-    if (errs.length||bad.length||r.overflow>0||r.glyphs.length||r.clipped.length||r.marks!==r.rows+1||r.bars!==r.rows) fail++;
+    if (errs.length||bad.length||coll.size||r.overflow>0||r.glyphs.length||r.clipped.length||r.marks!==r.rows+1||r.bars!==r.rows) fail++;
     await ctx.close();
   }
   await b.close(); console.log(fail?'FAIL':'PASS');
